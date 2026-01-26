@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="@dimen/padding_default"
     android:background="@color/blue"
     tools:context=".MainActivity">
 
@@ -14,6 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
+        android:layout_marginHorizontal="@dimen/padding_default"
         android:layout_marginBottom="40dp"
         android:text="@string/app_name"
         android:textColor="@color/white"
@@ -24,6 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:layout_marginHorizontal="@dimen/padding_default"
         android:gravity="end">
 
         <Button
@@ -37,7 +38,9 @@
             android:text="@string/search"
             android:textColor="@color/black"
             android:textSize="@dimen/font_size"
-            app:icon="@drawable/icon_search"
+            android:textAllCaps="false"
+            android:letterSpacing="0"
+            app:icon="@drawable/ic_search_24"
             app:iconGravity="textStart"
             app:iconPadding="@dimen/padding_icon"
             app:iconTint="@color/black"
@@ -54,7 +57,9 @@
             android:text="@string/library"
             android:textColor="@color/black"
             android:textSize="@dimen/font_size"
-            app:icon="@drawable/icon_media"
+            android:textAllCaps="false"
+            android:letterSpacing="0"
+            app:icon="@drawable/ic_library_24"
             app:iconGravity="textStart"
             app:iconPadding="@dimen/padding_icon"
             app:iconTint="@color/black"
@@ -71,7 +76,9 @@
             android:text="@string/settings"
             android:textColor="@color/black"
             android:textSize="@dimen/font_size"
-            app:icon="@drawable/icon_settings"
+            android:textAllCaps="false"
+            android:letterSpacing="0"
+            app:icon="@drawable/ic_settings_24"
             app:iconGravity="textStart"
             app:iconPadding="@dimen/padding_icon"
             app:iconTint="@color/black"

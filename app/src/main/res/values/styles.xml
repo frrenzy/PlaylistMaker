@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="ScreenTitle">
+        <item name="android:layout_marginHorizontal">@dimen/padding_default</item>
+        <item name="android:paddingTop">@dimen/padding_default</item>
+        <item name="android:textSize">@dimen/font_size</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/title_height</item>
+        <item name="android:layout_marginBottom">24dp</item>
+        <item name="android:layout_gravity">start</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textFontWeight">500</item>
+    </style>
+
+    <style name="MainButton" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_marginBottom">@dimen/padding_default</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:backgroundTint">@color/white</item>
+        <item name="android:gravity">center</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">@dimen/font_size</item>
+        <item name="cornerRadius">@dimen/padding_default</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">@dimen/padding_small</item>
+        <item name="iconTint">@color/black</item>
+        <item name="android:textFontWeight">500</item>
+    </style>
+
+    <style name="NavButtons">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:gravity">bottom</item>
+        <item name="android:theme">@style/Theme.PlaylistMaker.NavIcons</item>
+    </style>
+
+    <style name="NavButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:padding">@dimen/padding_small</item>
+    </style>
+
+    <style name="NavButtonIcon">
+        <item name="android:layout_width">@dimen/icon_button_size</item>
+        <item name="android:layout_height">@dimen/icon_button_size</item>
+    </style>
+
+    <style name="NavButtonText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontWeight">400</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="TextField">
+        <item name="android:background">@color/light_grey</item>
+        <item name="android:textColorHint">@color/text_grey</item>
+    </style>
+
+    <style name="SettingsLine">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:paddingVertical">@dimen/menu_option_padding</item>
+        <item name="android:paddingHorizontal">@dimen/padding_default</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <style name="SettingsLineText">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:paddingHorizontal">0dp</item>
+        <item name="android:textSize">@dimen/font_size_small</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textFontWeight">400</item>
+    </style>
+
+    <style name="SettingsLineContent">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+</resources>

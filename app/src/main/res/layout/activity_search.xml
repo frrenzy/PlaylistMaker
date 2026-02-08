@@ -1,13 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/search"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".SearchActivity">
 
     <TextView
+        style="@style/ScreenTitle"
+        android:text="@string/search" />
+
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Search" />
-</FrameLayout>
+        android:layout_height="52dp"
+        android:paddingHorizontal="@dimen/padding_default"
+        android:paddingVertical="@dimen/padding_small">
+
+        <EditText
+            android:id="@+id/search_field"
+            style="@style/TextField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_search_16"
+            android:drawablePadding="@dimen/padding_small"
+            android:fontFamily="@font/ys_display_regular"
+            android:gravity="start"
+            android:hint="@string/search"
+            android:inputType="text"
+            android:maxLines="1"
+            android:padding="10dp"
+            android:textCursorDrawable="@color/blue"
+            android:textFontWeight="400"
+            android:textSize="@dimen/font_size_small" />
+
+        <ImageView
+            android:id="@+id/search_clear_button"
+            android:layout_width="40dp"
+            android:layout_height="36dp"
+            android:layout_gravity="end"
+            android:background="@null"
+            android:gravity="center"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_close_16"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+    <LinearLayout style="@style/NavButtons">
+
+        <LinearLayout style="@style/NavButton">
+
+            <ImageView
+                style="@style/NavButtonIcon"
+                android:src="@drawable/ic_search_24" />
+
+            <TextView
+                style="@style/NavButtonText"
+                android:text="@string/search" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/NavButton">
+
+            <ImageView
+                style="@style/NavButtonIcon"
+                android:src="@drawable/ic_library_24" />
+
+            <TextView
+                style="@style/NavButtonText"
+                android:text="@string/library" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/NavButton">
+
+            <ImageView
+                style="@style/NavButtonIcon"
+                android:src="@drawable/ic_settings_24" />
+
+            <TextView
+                style="@style/NavButtonText"
+                android:text="@string/settings" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

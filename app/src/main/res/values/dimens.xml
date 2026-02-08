@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="title_height">56dp</dimen>
     <dimen name="font_size">22sp</dimen>
+    <dimen name="font_size_small">16sp</dimen>
     <dimen name="padding_default">16dp</dimen>
-    <dimen name="padding_icon">8dp</dimen>
-    <dimen name="font_size_small">16dp</dimen>
+    <dimen name="padding_small">8dp</dimen>
     <dimen name="icon_button_size">24dp</dimen>
     <dimen name="menu_option_padding">21dp</dimen>
 </resources>

@@ -3,12 +3,12 @@ package com.example.playlistmaker
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.playlistmaker.utils.connectBackButton
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,8 +21,7 @@ class SettingsActivity : AppCompatActivity() {
             insets
         }
 
-        val backButton = findViewById<ImageView>(R.id.settings_back_button)
-        backButton.setOnClickListener { finish() }
+        connectBackButton(R.id.settings_back_button)
 
         val shareButton = findViewById<LinearLayout>(R.id.settings_share)
         shareButton.setOnClickListener {

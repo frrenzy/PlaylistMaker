@@ -3,4 +3,5 @@
     <attr name="iconColor" format="color" />
     <attr name="backIconColor" format="color" />
     <attr name="fieldIconColor" format="color" />
+    <attr name="fieldBackgroundColor" format="color" />
 </resources>

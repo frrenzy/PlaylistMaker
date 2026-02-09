@@ -9,6 +9,7 @@
         <item name="backIconColor">@color/white</item>
         <item name="fieldIconColor">@color/black</item>
         <item name="android:textColorHint">@color/black</item>
+        <item name="fieldBackgroundColor">@color/white</item>
     </style>
 
     <style name="Theme.PlaylistMaker.MainScreen" parent="Base.Theme.PlaylistMaker">

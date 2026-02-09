@@ -11,6 +11,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.playlistmaker.utils.connectBackButton
 
 class SearchActivity : AppCompatActivity() {
     private var searchText = ""
@@ -25,6 +26,8 @@ class SearchActivity : AppCompatActivity() {
             insets
         }
 
+        connectBackButton(R.id.search_back_button)
+        
         val searchClearButton = findViewById<ImageView>(R.id.search_clear_button)
         val textField = findViewById<EditText>(R.id.search_field)
 

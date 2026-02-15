@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="iconColor" format="color" />
+    <attr name="backIconColor" format="color" />
+    <attr name="fieldIconColor" format="color" />
+    <attr name="fieldBackgroundColor" format="color" />
+</resources>

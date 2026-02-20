@@ -5,12 +5,6 @@ import com.example.playlistmaker.track.Track
 object Mocks {
     val tracks = arrayListOf(
         Track(
-            "Some veeeeeeeeeeeeeeeeeeeeeeeery long track name",
-            "Also veeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeery long artist name",
-            "5:01",
-            "",
-        ),
-        Track(
             "Smells Like Teen Spirit",
             "Nirvana",
             "5:01",

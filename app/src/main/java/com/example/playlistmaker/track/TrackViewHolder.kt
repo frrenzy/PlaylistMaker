@@ -17,12 +17,16 @@ class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     fun bind(model: Track) {
         Glide.with(itemView)
             .load(model.artworkUrl100)
-            .placeholder(R.drawable.ic_image_45)
+            .placeholder(R.drawable.ic_placeholder_45)
             .centerCrop()
-            .transform(RoundedCorners(2))
+            .transform(RoundedCorners(TRACK_ART_CORNER_RADIUS))
             .into(image)
         title.text = model.trackName
         author.text = model.artistName
         length.text = model.trackTime
+    }
+
+    companion object {
+        const val TRACK_ART_CORNER_RADIUS = 2
     }
 }

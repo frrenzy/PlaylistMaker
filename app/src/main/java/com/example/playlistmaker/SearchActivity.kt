@@ -11,6 +11,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.RecyclerView
+import com.example.playlistmaker.mock.Mocks
+import com.example.playlistmaker.track.TrackAdapter
 import com.example.playlistmaker.utils.connectBackButton
 
 class SearchActivity : AppCompatActivity() {
@@ -27,7 +30,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         connectBackButton(R.id.search_back_button)
-        
+
         val searchClearButton = findViewById<ImageView>(R.id.search_clear_button)
         val textField = findViewById<EditText>(R.id.search_field)
 
@@ -51,6 +54,10 @@ class SearchActivity : AppCompatActivity() {
             }
         }
         textField.addTextChangedListener(textWatcher)
+
+        val trackList = findViewById<RecyclerView>(R.id.track_list)
+        val trackListAdapter = TrackAdapter(Mocks.tracks)
+        trackList.adapter = trackListAdapter
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

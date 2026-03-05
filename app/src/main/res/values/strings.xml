@@ -15,4 +15,8 @@
     <string name="support_subject">Сообщение разработчикам и разработчицам приложения Playlist Maker</string>
     <string name="support_message">Спасибо разработчикам и разработчицам за крутое приложение!</string>
     <string name="track_info_separator">•</string>
+    <string name="network_error">Проблемы со связью</string>
+    <string name="network_error_hint">Загрузка не удалась. Проверьте подключение к интернету</string>
+    <string name="reload">Обновить</string>
+    <string name="not_found_error">Ничего не нашлось</string>
 </resources>

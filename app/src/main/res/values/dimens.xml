@@ -11,4 +11,5 @@
     <dimen name="menu_option_padding">21dp</dimen>
     <dimen name="track_card_height">61dp</dimen>
     <dimen name="track_image_size">45dp</dimen>
+    <dimen name="font_size_error">19sp</dimen>
 </resources>

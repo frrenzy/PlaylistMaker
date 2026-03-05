@@ -51,9 +51,11 @@
             android:fontFamily="@font/ys_display_regular"
             android:gravity="start"
             android:hint="@string/search"
+            android:imeOptions="actionDone"
             android:inputType="text"
             android:maxLines="1"
             android:padding="10dp"
+            android:singleLine="true"
             android:textFontWeight="400"
             android:textSize="@dimen/font_size_small" />
 
@@ -67,14 +69,48 @@
             android:scaleType="centerInside"
             android:src="@drawable/ic_close_16"
             android:visibility="gone" />
-
     </FrameLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/track_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+    <LinearLayout
+        android:id="@+id/network_error_block"
+        style="@style/SearchErrorBlock">
+
+        <ImageView
+            style="@style/SearchError"
+            android:src="@drawable/ic_network_error_120" />
+
+        <TextView
+            style="@style/SearchError.Text"
+            android:text="@string/network_error" />
+
+        <TextView
+            style="@style/SearchError.Text"
+            android:text="@string/network_error_hint" />
+
+        <Button
+            android:id="@+id/reload_button"
+            style="@style/SearchReloadButton"
+            android:text="@string/reload" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/not_found_error_block"
+        style="@style/SearchErrorBlock">
+
+        <ImageView
+            style="@style/SearchError"
+            android:src="@drawable/ic_not_found_120" />
+
+        <TextView
+            style="@style/SearchError.Text"
+            android:text="@string/not_found_error" />
+    </LinearLayout>
 
 </LinearLayout>

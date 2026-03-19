@@ -71,6 +71,37 @@
             android:visibility="gone" />
     </FrameLayout>
 
+    <LinearLayout
+        android:id="@+id/search_history"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <TextView
+            style="@style/SearchSection.Text"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/padding_section"
+            android:paddingBottom="@dimen/padding_small"
+            android:text="@string/search_history_title" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/search_history_track_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        <Button
+            android:id="@+id/search_history_clear_button"
+            style="@style/SearchActionButton"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/padding_section"
+            android:text="@string/search_history_clear" />
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/track_list"
         android:layout_width="match_parent"
@@ -83,20 +114,20 @@
         style="@style/SearchErrorBlock">
 
         <ImageView
-            style="@style/SearchError"
+            style="@style/SearchSection"
             android:src="@drawable/ic_network_error_120" />
 
         <TextView
-            style="@style/SearchError.Text"
+            style="@style/SearchSection.Text"
             android:text="@string/network_error" />
 
         <TextView
-            style="@style/SearchError.Text"
+            style="@style/SearchSection.Text"
             android:text="@string/network_error_hint" />
 
         <Button
             android:id="@+id/reload_button"
-            style="@style/SearchReloadButton"
+            style="@style/SearchActionButton"
             android:text="@string/reload" />
     </LinearLayout>
 
@@ -105,11 +136,11 @@
         style="@style/SearchErrorBlock">
 
         <ImageView
-            style="@style/SearchError"
+            style="@style/SearchSection"
             android:src="@drawable/ic_not_found_120" />
 
         <TextView
-            style="@style/SearchError.Text"
+            style="@style/SearchSection.Text"
             android:text="@string/not_found_error" />
     </LinearLayout>
 

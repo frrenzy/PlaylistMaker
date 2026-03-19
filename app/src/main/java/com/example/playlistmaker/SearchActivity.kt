@@ -18,6 +18,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.track.api.SearchTracksResponse
 import com.example.playlistmaker.track.api.getTracksService
+import com.example.playlistmaker.track.history.TrackSearchHistory
 import com.example.playlistmaker.track.model.Track
 import com.example.playlistmaker.track.presentation.TrackAdapter
 import com.example.playlistmaker.utils.connectBackButton
@@ -36,8 +37,17 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var networkErrorBlock: LinearLayout
     private lateinit var notFoundErrorBlock: LinearLayout
     private lateinit var reloadButton: Button
+    private lateinit var searchHistoryBlock: LinearLayout
+    private lateinit var searchHistoryTrackList: RecyclerView
+    private lateinit var searchHistoryClearButton: Button
 
-    private val adapter = TrackAdapter()
+    private val adapter = TrackAdapter {
+        searchHistory.add(it)
+        updateSearchHistoryList()
+    }
+    private val historyAdapter = TrackAdapter()
+
+    private lateinit var searchHistory: TrackSearchHistory
 
     private var searchText = ""
 
@@ -60,6 +70,16 @@ class SearchActivity : AppCompatActivity() {
         notFoundErrorBlock = findViewById(R.id.not_found_error_block)
         reloadButton = findViewById(R.id.reload_button)
 
+        searchHistoryBlock = findViewById(R.id.search_history)
+        searchHistoryTrackList = findViewById(R.id.search_history_track_list)
+        searchHistoryClearButton = findViewById(R.id.search_history_clear_button)
+        searchHistory = TrackSearchHistory(
+            getSharedPreferences(
+                PLAYLIST_MAKER_PREFERENCES,
+                MODE_PRIVATE
+            )
+        )
+
         adapter.tracks = tracks
         trackList.adapter = adapter
 
@@ -69,6 +89,8 @@ class SearchActivity : AppCompatActivity() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 searchClearButton.visibility = clearButtonVisibility(s)
+                searchHistoryBlock.visibility =
+                    searchHistoryBlockVisibility(searchField.text, searchField.hasFocus())
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -85,6 +107,10 @@ class SearchActivity : AppCompatActivity() {
                 else -> false
             }
         }
+        searchField.setOnFocusChangeListener { _, hasFocus ->
+            searchHistoryBlock.visibility =
+                searchHistoryBlockVisibility(searchField.text, hasFocus)
+        }
 
         searchClearButton.setOnClickListener {
             searchField.setText("")
@@ -93,6 +119,15 @@ class SearchActivity : AppCompatActivity() {
         }
 
         reloadButton.setOnClickListener { loadTracks() }
+
+        searchHistoryTrackList.adapter = historyAdapter
+        updateSearchHistoryList()
+
+        searchHistoryClearButton.setOnClickListener {
+            searchHistory.clear()
+            updateSearchHistoryList()
+            searchHistoryBlock.visibility = View.GONE
+        }
     }
 
     private fun loadTracks() {
@@ -176,6 +211,18 @@ class SearchActivity : AppCompatActivity() {
         } else {
             View.VISIBLE
         }
+    }
+
+    private fun searchHistoryBlockVisibility(s: CharSequence?, focus: Boolean): Int {
+        return if (focus && searchHistory.size != 0 && s.isNullOrEmpty())
+            View.VISIBLE
+        else
+            View.GONE
+    }
+
+    private fun updateSearchHistoryList() {
+        historyAdapter.tracks = searchHistory.getAll()
+        historyAdapter.notifyDataSetChanged()
     }
 
     private fun hideKeyboard() {

@@ -1,16 +1,22 @@
 package com.example.playlistmaker
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.widget.LinearLayout
+import android.widget.Switch
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.playlistmaker.utils.connectBackButton
 
 class SettingsActivity : AppCompatActivity() {
+    private lateinit var themeSwitcher: Switch
+    private lateinit var shareButton: LinearLayout
+    private lateinit var supportButton: LinearLayout
+    private lateinit var agreementButton: LinearLayout
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -23,7 +29,13 @@ class SettingsActivity : AppCompatActivity() {
 
         connectBackButton(R.id.settings_back_button)
 
-        val shareButton = findViewById<LinearLayout>(R.id.settings_share)
+        themeSwitcher = findViewById(R.id.settings_theme_switcher)
+        themeSwitcher.isChecked = (applicationContext as App).darkTheme
+        themeSwitcher.setOnCheckedChangeListener { _, checked ->
+            (applicationContext as App).switchTheme(checked)
+        }
+
+        shareButton = findViewById(R.id.settings_share)
         shareButton.setOnClickListener {
             val shareIntent = Intent(Intent.ACTION_SEND)
             shareIntent.setType("text/plain")
@@ -40,10 +52,10 @@ class SettingsActivity : AppCompatActivity() {
             )
         }
 
-        val supportButton = findViewById<LinearLayout>(R.id.settings_support)
+        supportButton = findViewById(R.id.settings_support)
         supportButton.setOnClickListener {
             val shareIntent = Intent(Intent.ACTION_SENDTO)
-            shareIntent.data = Uri.parse("mailto:")
+            shareIntent.data = "mailto:".toUri()
             shareIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.support_email)))
             shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.support_subject))
             shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.support_message))
@@ -51,13 +63,12 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(shareIntent)
         }
 
-        val agreementButton = findViewById<LinearLayout>(R.id.settings_agreement)
+        agreementButton = findViewById(R.id.settings_agreement)
         agreementButton.setOnClickListener {
-            Uri.parse(getString(R.string.agreement_link)).let { webpage ->
-                val viewIntent = Intent(Intent.ACTION_VIEW, webpage)
+            val webpage = getString(R.string.agreement_link).toUri()
+            val viewIntent = Intent(Intent.ACTION_VIEW, webpage)
 
-                startActivity(viewIntent)
-            }
+            startActivity(viewIntent)
         }
     }
 }

@@ -19,4 +19,6 @@
     <string name="network_error_hint">Загрузка не удалась. Проверьте подключение к интернету</string>
     <string name="reload">Обновить</string>
     <string name="not_found_error">Ничего не нашлось</string>
+    <string name="search_history_title">Вы искали</string>
+    <string name="search_history_clear">Очистить историю</string>
 </resources>

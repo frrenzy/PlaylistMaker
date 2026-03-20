@@ -15,11 +15,11 @@ class TrackSearchHistory(val preferences: SharedPreferences, val maxDepth: Int =
 
     override fun add(item: Track) {
         val savedTracks = loadFromPreferences()
-        val newTracks = mutableListOf(item)
+        var newTracks = mutableListOf(item)
 
         savedTracks.filterTo(newTracks) { it.trackId != item.trackId }
         if (newTracks.size > maxDepth) {
-            newTracks.removeLast()
+            newTracks = ArrayList(newTracks.slice(0..<maxDepth))
         }
         size = newTracks.size
 

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -15,6 +14,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.track.api.SearchTracksResponse
 import com.example.playlistmaker.track.api.getTracksService
@@ -88,8 +88,8 @@ class SearchActivity : AppCompatActivity() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                searchClearButton.visibility = clearButtonVisibility(s)
-                searchHistoryBlock.visibility =
+                searchClearButton.isVisible = clearButtonVisibility(s)
+                searchHistoryBlock.isVisible =
                     searchHistoryBlockVisibility(searchField.text, searchField.hasFocus())
             }
 
@@ -108,7 +108,7 @@ class SearchActivity : AppCompatActivity() {
             }
         }
         searchField.setOnFocusChangeListener { _, hasFocus ->
-            searchHistoryBlock.visibility =
+            searchHistoryBlock.isVisible =
                 searchHistoryBlockVisibility(searchField.text, hasFocus)
         }
 
@@ -126,7 +126,7 @@ class SearchActivity : AppCompatActivity() {
         searchHistoryClearButton.setOnClickListener {
             searchHistory.clear()
             updateSearchHistoryList()
-            searchHistoryBlock.visibility = View.GONE
+            searchHistoryBlock.isVisible = false
         }
     }
 
@@ -165,19 +165,19 @@ class SearchActivity : AppCompatActivity() {
         hideKeyboard()
         setTrackList()
 
-        networkErrorBlock.visibility = View.VISIBLE
+        networkErrorBlock.isVisible = true
     }
 
     fun showNotFoundErrorMessage() {
         setTrackList()
 
-        notFoundErrorBlock.visibility = View.VISIBLE
+        notFoundErrorBlock.isVisible = true
     }
 
     @SuppressLint("NotifyDataSetChanged")
     fun setTrackList(newTracks: ArrayList<Track> = ArrayList()) {
-        networkErrorBlock.visibility = View.GONE
-        notFoundErrorBlock.visibility = View.GONE
+        networkErrorBlock.isVisible = false
+        notFoundErrorBlock.isVisible = false
 
         tracks.clear()
         tracks.addAll(newTracks)
@@ -205,20 +205,10 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun clearButtonVisibility(s: CharSequence?): Int {
-        return if (s.isNullOrEmpty()) {
-            View.GONE
-        } else {
-            View.VISIBLE
-        }
-    }
+    private fun clearButtonVisibility(s: CharSequence?) = !s.isNullOrEmpty()
 
-    private fun searchHistoryBlockVisibility(s: CharSequence?, focus: Boolean): Int {
-        return if (focus && searchHistory.size != 0 && s.isNullOrEmpty())
-            View.VISIBLE
-        else
-            View.GONE
-    }
+    private fun searchHistoryBlockVisibility(s: CharSequence?, focus: Boolean) =
+        (focus && searchHistory.size != 0 && s.isNullOrEmpty())
 
     private fun updateSearchHistoryList() {
         historyAdapter.tracks = searchHistory.getAll()

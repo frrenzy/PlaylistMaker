@@ -82,18 +82,18 @@
         <item name="android:visibility">gone</item>
     </style>
 
-    <style name="SearchError">
+    <style name="SearchSection">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:paddingBottom">@dimen/padding_default</item>
     </style>
 
-    <style name="SearchError.Text">
+    <style name="SearchSection.Text">
         <item name="android:textAlignment">center</item>
         <item name="android:textSize">@dimen/font_size_error</item>
     </style>
 
-    <style name="SearchReloadButton">
+    <style name="SearchActionButton">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:backgroundTint">@color/black</item>

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -15,9 +14,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.track.api.SearchTracksResponse
 import com.example.playlistmaker.track.api.getTracksService
+import com.example.playlistmaker.track.history.TrackSearchHistory
 import com.example.playlistmaker.track.model.Track
 import com.example.playlistmaker.track.presentation.TrackAdapter
 import com.example.playlistmaker.utils.connectBackButton
@@ -36,8 +37,17 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var networkErrorBlock: LinearLayout
     private lateinit var notFoundErrorBlock: LinearLayout
     private lateinit var reloadButton: Button
+    private lateinit var searchHistoryBlock: LinearLayout
+    private lateinit var searchHistoryTrackList: RecyclerView
+    private lateinit var searchHistoryClearButton: Button
 
-    private val adapter = TrackAdapter()
+    private val adapter = TrackAdapter {
+        searchHistory.add(it)
+        updateSearchHistoryList()
+    }
+    private val historyAdapter = TrackAdapter()
+
+    private lateinit var searchHistory: TrackSearchHistory
 
     private var searchText = ""
 
@@ -60,6 +70,16 @@ class SearchActivity : AppCompatActivity() {
         notFoundErrorBlock = findViewById(R.id.not_found_error_block)
         reloadButton = findViewById(R.id.reload_button)
 
+        searchHistoryBlock = findViewById(R.id.search_history)
+        searchHistoryTrackList = findViewById(R.id.search_history_track_list)
+        searchHistoryClearButton = findViewById(R.id.search_history_clear_button)
+        searchHistory = TrackSearchHistory(
+            getSharedPreferences(
+                PLAYLIST_MAKER_PREFERENCES,
+                MODE_PRIVATE
+            )
+        )
+
         adapter.tracks = tracks
         trackList.adapter = adapter
 
@@ -68,7 +88,9 @@ class SearchActivity : AppCompatActivity() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                searchClearButton.visibility = clearButtonVisibility(s)
+                searchClearButton.isVisible = clearButtonVisibility(s)
+                searchHistoryBlock.isVisible =
+                    searchHistoryBlockVisibility(searchField.text, searchField.hasFocus())
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -85,6 +107,10 @@ class SearchActivity : AppCompatActivity() {
                 else -> false
             }
         }
+        searchField.setOnFocusChangeListener { _, hasFocus ->
+            searchHistoryBlock.isVisible =
+                searchHistoryBlockVisibility(searchField.text, hasFocus)
+        }
 
         searchClearButton.setOnClickListener {
             searchField.setText("")
@@ -93,6 +119,15 @@ class SearchActivity : AppCompatActivity() {
         }
 
         reloadButton.setOnClickListener { loadTracks() }
+
+        searchHistoryTrackList.adapter = historyAdapter
+        updateSearchHistoryList()
+
+        searchHistoryClearButton.setOnClickListener {
+            searchHistory.clear()
+            updateSearchHistoryList()
+            searchHistoryBlock.isVisible = false
+        }
     }
 
     private fun loadTracks() {
@@ -130,19 +165,19 @@ class SearchActivity : AppCompatActivity() {
         hideKeyboard()
         setTrackList()
 
-        networkErrorBlock.visibility = View.VISIBLE
+        networkErrorBlock.isVisible = true
     }
 
     fun showNotFoundErrorMessage() {
         setTrackList()
 
-        notFoundErrorBlock.visibility = View.VISIBLE
+        notFoundErrorBlock.isVisible = true
     }
 
     @SuppressLint("NotifyDataSetChanged")
     fun setTrackList(newTracks: ArrayList<Track> = ArrayList()) {
-        networkErrorBlock.visibility = View.GONE
-        notFoundErrorBlock.visibility = View.GONE
+        networkErrorBlock.isVisible = false
+        notFoundErrorBlock.isVisible = false
 
         tracks.clear()
         tracks.addAll(newTracks)
@@ -170,12 +205,14 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun clearButtonVisibility(s: CharSequence?): Int {
-        return if (s.isNullOrEmpty()) {
-            View.GONE
-        } else {
-            View.VISIBLE
-        }
+    private fun clearButtonVisibility(s: CharSequence?) = !s.isNullOrEmpty()
+
+    private fun searchHistoryBlockVisibility(s: CharSequence?, focus: Boolean) =
+        (focus && searchHistory.size != 0 && s.isNullOrEmpty())
+
+    private fun updateSearchHistoryList() {
+        historyAdapter.tracks = searchHistory.getAll()
+        historyAdapter.notifyDataSetChanged()
     }
 
     private fun hideKeyboard() {

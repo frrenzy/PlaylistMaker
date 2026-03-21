@@ -41,6 +41,7 @@
             android:text="@string/settings_theme" />
 
         <Switch
+            android:id="@+id/settings_theme_switcher"
             style="@style/SettingsLineContent"
             android:layout_gravity="end"
             android:paddingHorizontal="0dp" />

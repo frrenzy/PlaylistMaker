@@ -13,4 +13,5 @@
     <dimen name="track_image_size">45dp</dimen>
     <dimen name="font_size_error">19sp</dimen>
     <dimen name="padding_section">24dp</dimen>
+    <dimen name="padding_large">24dp</dimen>
 </resources>

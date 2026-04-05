@@ -4,4 +4,5 @@
     <attr name="backIconColor" format="color" />
     <attr name="fieldIconColor" format="color" />
     <attr name="fieldBackgroundColor" format="color" />
+    <attr name="buttonColor" format="color" />
 </resources>

@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.track.model.Track
 import com.example.playlistmaker.utils.connectBackButton
+import com.example.playlistmaker.utils.dp
 
 class PlayerActivity : AppCompatActivity() {
     private lateinit var trackName: TextView
@@ -78,9 +79,9 @@ class PlayerActivity : AppCompatActivity() {
 
         Glide.with(this@PlayerActivity)
             .load(track.coverArtworkUrl)
-            .placeholder(R.drawable.ic_placeholder_312)
+            .placeholder(R.drawable.ic_placeholder_45)
             .centerCrop()
-            .transform(RoundedCorners(TRACK_ART_CORNER_RADIUS))
+            .transform(RoundedCorners(TRACK_ART_CORNER_RADIUS.dp))
             .into(trackCover)
     }
 

@@ -60,7 +60,7 @@
             app:layout_constraintEnd_toStartOf="@id/right_border"
             app:layout_constraintStart_toEndOf="@id/left_border"
             app:layout_constraintTop_toBottomOf="@id/player_back_button"
-            tools:src="@drawable/ic_placeholder_312" />
+            tools:src="@drawable/ic_placeholder_45" />
 
         <TextView
             android:id="@+id/track_name"

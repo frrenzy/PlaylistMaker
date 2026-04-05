@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -44,8 +45,11 @@ class SearchActivity : AppCompatActivity() {
     private val adapter = TrackAdapter {
         searchHistory.add(it)
         updateSearchHistoryList()
+        openPlayer(it)
     }
-    private val historyAdapter = TrackAdapter()
+    private val historyAdapter = TrackAdapter {
+        openPlayer(it)
+    }
 
     private lateinit var searchHistory: TrackSearchHistory
 
@@ -219,6 +223,13 @@ class SearchActivity : AppCompatActivity() {
         val inputMethodManager =
             getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
         inputMethodManager?.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
+    }
+
+    private fun openPlayer(track: Track) {
+        val intent = Intent(this@SearchActivity, PlayerActivity::class.java)
+        intent.putExtra(PLAYER_TRACK_KEY, track)
+
+        startActivity(intent)
     }
 
     companion object {

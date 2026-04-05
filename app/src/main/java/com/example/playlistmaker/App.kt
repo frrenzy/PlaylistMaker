@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatDelegate
 
 const val PLAYLIST_MAKER_PREFERENCES = "playlist_maker_preferences"
 const val THEME_PREFERENCES_KEY = "theme"
+const val PLAYER_TRACK_KEY = "player_track"
 
 class App : Application() {
     var darkTheme = false

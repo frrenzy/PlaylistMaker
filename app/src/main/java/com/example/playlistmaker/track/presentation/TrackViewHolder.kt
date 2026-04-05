@@ -8,6 +8,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.track.model.Track
+import com.example.playlistmaker.utils.dp
 
 class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val image = itemView.findViewById<ImageView>(R.id.track_image)
@@ -20,7 +21,7 @@ class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             .load(model.artworkUrl100)
             .placeholder(R.drawable.ic_placeholder_45)
             .centerCrop()
-            .transform(RoundedCorners(TRACK_ART_CORNER_RADIUS))
+            .transform(RoundedCorners(TRACK_ART_CORNER_RADIUS.dp))
             .into(image)
         title.text = model.trackName
         author.text = model.artistName

@@ -9,7 +9,7 @@ import retrofit2.http.Query
 interface TrackApiService {
     @GET("search")
     fun search(
-        @Query("term") text: String,
+        @Query("term", encoded = true) text: String,
         @Query("entity") entity: String = "song"
     ): Call<SearchTracksResponse>
 }

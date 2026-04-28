@@ -19,7 +19,7 @@ class TrackSearchHistory(val preferences: SharedPreferences, val maxDepth: Int =
 
         savedTracks.filterTo(newTracks) { it.trackId != item.trackId }
         if (newTracks.size > maxDepth) {
-            newTracks = ArrayList(newTracks.slice(0..<maxDepth))
+            newTracks = ArrayList(newTracks.slice(0 until maxDepth))
         }
         size = newTracks.size
 

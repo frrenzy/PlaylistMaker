@@ -3,6 +3,8 @@ package com.example.playlistmaker
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.inputmethod.EditorInfo
@@ -11,6 +13,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -41,6 +44,10 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchHistoryBlock: LinearLayout
     private lateinit var searchHistoryTrackList: RecyclerView
     private lateinit var searchHistoryClearButton: Button
+    private lateinit var progressBar: ProgressBar
+
+    private val searchRunnable = Runnable { searchRequest() }
+    private val handler = Handler(Looper.getMainLooper())
 
     private val adapter = TrackAdapter {
         searchHistory.add(it)
@@ -73,6 +80,7 @@ class SearchActivity : AppCompatActivity() {
         networkErrorBlock = findViewById(R.id.network_error_block)
         notFoundErrorBlock = findViewById(R.id.not_found_error_block)
         reloadButton = findViewById(R.id.reload_button)
+        progressBar = findViewById(R.id.progress_circular)
 
         searchHistoryBlock = findViewById(R.id.search_history)
         searchHistoryTrackList = findViewById(R.id.search_history_track_list)
@@ -95,6 +103,7 @@ class SearchActivity : AppCompatActivity() {
                 searchClearButton.isVisible = clearButtonVisibility(s)
                 searchHistoryBlock.isVisible =
                     searchHistoryBlockVisibility(searchField.text, searchField.hasFocus())
+                loadTracks()
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -104,7 +113,7 @@ class SearchActivity : AppCompatActivity() {
         searchField.setOnEditorActionListener { _, actionId, _ ->
             when (actionId) {
                 EditorInfo.IME_ACTION_DONE -> {
-                    loadTracks()
+                    loadTracks(0L)
                     true
                 }
 
@@ -134,11 +143,13 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadTracks() {
+    private fun searchRequest() {
         val term = searchField.text.toString()
         if (term.isEmpty()) {
             return
         }
+
+        showProgressBar()
 
         tracksService.search(term).enqueue(object : Callback<SearchTracksResponse> {
             @SuppressLint("NotifyDataSetChanged")
@@ -146,12 +157,14 @@ class SearchActivity : AppCompatActivity() {
                 call: Call<SearchTracksResponse?>,
                 response: Response<SearchTracksResponse?>
             ) {
+                hideProgressBar()
                 when (response.code()) {
                     200 -> {
                         val results = response.body()?.results
                         if (results?.isEmpty() == true) {
                             showNotFoundErrorMessage()
                         } else {
+                            trackList.isVisible = true
                             setTrackList(results!!)
                         }
                     }
@@ -160,9 +173,19 @@ class SearchActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onFailure(call: Call<SearchTracksResponse?>, t: Throwable) =
+            override fun onFailure(call: Call<SearchTracksResponse?>, t: Throwable) {
+                hideProgressBar()
                 showNetworkErrorMessage()
+            }
         })
+    }
+
+    private fun loadTracks(delay: Long = SEARCH_DEBOUNCE_DELAY) {
+        handler.removeCallbacks(searchRunnable)
+        if (delay == 0L) handler.post(searchRunnable) else handler.postDelayed(
+            searchRunnable,
+            delay
+        )
     }
 
     fun showNetworkErrorMessage() {
@@ -219,6 +242,19 @@ class SearchActivity : AppCompatActivity() {
         historyAdapter.notifyDataSetChanged()
     }
 
+    private fun showProgressBar() {
+        searchHistoryBlock.isVisible = false
+        networkErrorBlock.isVisible = false
+        notFoundErrorBlock.isVisible = false
+        trackList.isVisible = false
+
+        progressBar.isVisible = true
+    }
+
+    private fun hideProgressBar() {
+        progressBar.isVisible = false
+    }
+
     private fun hideKeyboard() {
         val inputMethodManager =
             getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
@@ -232,9 +268,15 @@ class SearchActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacksAndMessages(null)
+    }
+
     companion object {
         const val SEARCH_TEXT = "SEARCH_TEXT"
         const val SEARCH_DEFAULT = ""
         const val TRACKS = "TRACKS"
+        const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
 }

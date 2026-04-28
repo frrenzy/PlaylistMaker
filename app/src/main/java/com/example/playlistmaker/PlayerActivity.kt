@@ -1,6 +1,10 @@
 package com.example.playlistmaker
 
+import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -27,6 +31,18 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var trackGenre: TextView
     private lateinit var trackCountry: TextView
     private lateinit var track: Track
+    private lateinit var playButton: ImageButton
+    private lateinit var playTime: TextView
+
+    private val handler = Handler(Looper.getMainLooper())
+    private val player = MediaPlayer()
+    private var playerState = PlayerState.DEFAULT
+    private var updateTrackTimeRunnable: Runnable = Runnable {
+        player.currentPosition.let { Track.trackTimeFormat.format(it) }.also {
+            playTime.text = it
+        }
+        handler.postDelayed(updateTrackTimeRunnable, TRACK_TIME_UPDATE_INTERVAL)
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,10 +68,16 @@ class PlayerActivity : AppCompatActivity() {
         trackAlbumGroup = findViewById(R.id.track_album_group)
         trackYearGroup = findViewById(R.id.track_year_group)
 
+        playButton = findViewById(R.id.play_button)
+        playTime = findViewById(R.id.play_time)
+
+        playButton.setOnClickListener { playbackControl() }
+
         track = intent.getParcelableExtra(PLAYER_TRACK_KEY, Track::class.java)
             ?: return
 
         drawTrack()
+        preparePlayer(track.previewUrl)
     }
 
     private fun drawTrack() {
@@ -85,6 +107,43 @@ class PlayerActivity : AppCompatActivity() {
             .into(trackCover)
     }
 
+    private fun preparePlayer(url: String) {
+        player.setDataSource(url)
+        player.prepareAsync()
+        player.setOnPreparedListener {
+            playButton.isEnabled = true
+            playerState = PlayerState.PREPARED
+            playTime.text = Track.trackTimeFormat.format(0)
+        }
+        player.setOnCompletionListener {
+            playerState = PlayerState.PREPARED
+            playButton.background = getDrawable(R.drawable.play_button)
+            handler.removeCallbacks(updateTrackTimeRunnable)
+            playTime.text = Track.trackTimeFormat.format(0)
+        }
+    }
+
+    private fun startPlayer() {
+        player.start()
+        playButton.background = getDrawable(R.drawable.pause_button)
+        handler.post(updateTrackTimeRunnable)
+        playerState = PlayerState.PLAYING
+    }
+
+    private fun pausePlayer() {
+        player.pause()
+        playButton.background = getDrawable(R.drawable.play_button)
+        handler.removeCallbacks(updateTrackTimeRunnable)
+        playerState = PlayerState.PAUSED
+    }
+
+    private fun playbackControl() =
+        when (playerState) {
+            PlayerState.PLAYING -> pausePlayer()
+            PlayerState.PREPARED, PlayerState.PAUSED -> startPlayer()
+            else -> Unit
+        }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
@@ -98,8 +157,27 @@ class PlayerActivity : AppCompatActivity() {
         drawTrack()
     }
 
+    override fun onPause() {
+        super.onPause()
+        pausePlayer()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        pausePlayer()
+        player.release()
+    }
+
+    enum class PlayerState {
+        DEFAULT,
+        PREPARED,
+        PLAYING,
+        PAUSED,
+    }
+
     companion object {
         const val TRACK_ART_CORNER_RADIUS = 8
         const val TRACK_BUNDLE_KEY = "track"
+        const val TRACK_TIME_UPDATE_INTERVAL = 300L
     }
 }

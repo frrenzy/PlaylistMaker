@@ -3,8 +3,8 @@ package com.example.playlistmaker
 import android.app.Application
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.edit
 
-const val PLAYLIST_MAKER_PREFERENCES = "playlist_maker_preferences"
 const val THEME_PREFERENCES_KEY = "theme"
 const val PLAYER_TRACK_KEY = "player_track"
 
@@ -15,7 +15,7 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        preferences = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
+        preferences = Creator.provideSharedPrefs(this)
 
         val darkThemeEnabled = preferences
             .getBoolean(
@@ -34,9 +34,8 @@ class App : Application() {
                 AppCompatDelegate.MODE_NIGHT_NO
             }
         )
-        preferences
-            .edit()
-            .putBoolean(THEME_PREFERENCES_KEY, darkThemeEnabled)
-            .apply()
+        preferences.edit {
+            putBoolean(THEME_PREFERENCES_KEY, darkThemeEnabled)
+        }
     }
 }

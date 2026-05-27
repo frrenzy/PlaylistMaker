@@ -10,8 +10,8 @@ interface TracksInteractor {
     }
 }
 
-sealed class SearchResult {
-    data class Success(val tracks: List<Track>) : SearchResult()
-    object Empty : SearchResult()
-    data class Error(val message: String) : SearchResult()
+sealed interface SearchResult {
+    data class Success(val tracks: List<Track>) : SearchResult
+    object Empty : SearchResult
+    data class Error(val message: String) : SearchResult
 }

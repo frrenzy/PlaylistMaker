@@ -1,16 +1,15 @@
 package com.example.playlistmaker.ui.settings
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.LinearLayout
 import android.widget.Switch
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.playlistmaker.App
+import com.example.playlistmaker.Creator
 import com.example.playlistmaker.R
+import com.example.playlistmaker.domain.settings.SettingsInteractor
 import com.example.playlistmaker.utils.connectBackButton
 
 class SettingsActivity : AppCompatActivity() {
@@ -18,6 +17,8 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var shareButton: LinearLayout
     private lateinit var supportButton: LinearLayout
     private lateinit var agreementButton: LinearLayout
+
+    private lateinit var settingsInteractor: SettingsInteractor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,46 +32,27 @@ class SettingsActivity : AppCompatActivity() {
 
         connectBackButton(R.id.settings_back_button)
 
+        settingsInteractor = Creator.provideSettingsInteractor(this)
+
         themeSwitcher = findViewById(R.id.settings_theme_switcher)
-        themeSwitcher.isChecked = (applicationContext as App).darkTheme
+        themeSwitcher.isChecked = settingsInteractor.dark
         themeSwitcher.setOnCheckedChangeListener { _, checked ->
-            (applicationContext as App).switchTheme(checked)
+            settingsInteractor.setTheme(checked)
         }
 
         shareButton = findViewById(R.id.settings_share)
         shareButton.setOnClickListener {
-            val shareIntent = Intent(Intent.ACTION_SEND)
-            shareIntent.setType("text/plain")
-            shareIntent.putExtra(
-                Intent.EXTRA_TEXT,
-                getString(R.string.share_message)
-            )
-
-            startActivity(
-                Intent.createChooser(
-                    shareIntent,
-                    getString(R.string.share_title)
-                )
-            )
+            settingsInteractor.shareApp()
         }
 
         supportButton = findViewById(R.id.settings_support)
         supportButton.setOnClickListener {
-            val shareIntent = Intent(Intent.ACTION_SENDTO)
-            shareIntent.data = "mailto:".toUri()
-            shareIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.support_email)))
-            shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.support_subject))
-            shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.support_message))
-
-            startActivity(shareIntent)
+            settingsInteractor.sendSupportTicket()
         }
 
         agreementButton = findViewById(R.id.settings_agreement)
         agreementButton.setOnClickListener {
-            val webpage = getString(R.string.agreement_link).toUri()
-            val viewIntent = Intent(Intent.ACTION_VIEW, webpage)
-
-            startActivity(viewIntent)
+            settingsInteractor.openUserAgreement()
         }
     }
 }

@@ -8,10 +8,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class RetrofitNetworkClient : NetworkClient {
 
-    private val trackServiceBaseUrl = "https://itunes.apple.com/"
     private val retrofit = Retrofit
         .Builder()
-        .baseUrl(trackServiceBaseUrl)
+        .baseUrl(TRACK_SERVICE_BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
@@ -21,5 +20,9 @@ class RetrofitNetworkClient : NetworkClient {
         val resp = tracksService.search(dto.term).execute()
         val body = resp.body() ?: Response()
         return body.apply { resultCode = resp.code() }
+    }
+
+    companion object {
+        private const val TRACK_SERVICE_BASE_URL = "https://itunes.apple.com/"
     }
 }

@@ -1,4 +1,4 @@
-package com.example.playlistmaker.track.model
+package com.example.playlistmaker.domain.models
 
 import android.icu.text.SimpleDateFormat
 import android.os.Parcelable
@@ -7,7 +7,7 @@ import java.util.Locale
 
 @Parcelize
 data class Track(
-    val trackId: Int,
+    val trackId: Long,
     val trackName: String,
     val artistName: String,
     val trackTimeMillis: Int,
@@ -17,16 +17,13 @@ data class Track(
     val primaryGenreName: String,
     val country: String,
     val previewUrl: String,
+    val coverArtworkUrl: String?,
+    val year: String?,
 ) : Parcelable {
     val trackTime: String
         get() = trackTimeFormat.format(trackTimeMillis)
-    val coverArtworkUrl: String?
-        get() = artworkUrl100?.replaceAfterLast('/', "512x512bb.jpg")
-    val year: String?
-        get() = releaseDate?.substringBefore('-')
 
     companion object {
         val trackTimeFormat = SimpleDateFormat("mm:ss", Locale.getDefault())
     }
-
 }

@@ -1,4 +1,4 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.search
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -20,18 +20,19 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import com.example.playlistmaker.track.api.SearchTracksResponse
-import com.example.playlistmaker.track.api.getTracksService
-import com.example.playlistmaker.track.history.TrackSearchHistory
-import com.example.playlistmaker.track.model.Track
-import com.example.playlistmaker.track.presentation.TrackAdapter
+import com.example.playlistmaker.Creator
+import com.example.playlistmaker.PLAYER_TRACK_KEY
+import com.example.playlistmaker.R
+import com.example.playlistmaker.domain.api.SearchResult
+import com.example.playlistmaker.domain.history.TracksHistoryInteractor
+import com.example.playlistmaker.domain.models.Track
+import com.example.playlistmaker.presentation.TrackAdapter
+import com.example.playlistmaker.ui.player.PlayerActivity
 import com.example.playlistmaker.utils.connectBackButton
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class SearchActivity : AppCompatActivity() {
-    private val tracksService = getTracksService()
+    private val tracksInteractor = Creator.provideTracksInteractor()
+    private lateinit var historyInteractor: TracksHistoryInteractor
 
     private val tracks = ArrayList<Track>()
 
@@ -50,15 +51,13 @@ class SearchActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
 
     private val adapter = TrackAdapter {
-        searchHistory.add(it)
+        historyInteractor.saveTrack(it)
         updateSearchHistoryList()
         openPlayer(it)
     }
     private val historyAdapter = TrackAdapter {
         openPlayer(it)
     }
-
-    private lateinit var searchHistory: TrackSearchHistory
 
     private var searchText = ""
 
@@ -85,12 +84,7 @@ class SearchActivity : AppCompatActivity() {
         searchHistoryBlock = findViewById(R.id.search_history)
         searchHistoryTrackList = findViewById(R.id.search_history_track_list)
         searchHistoryClearButton = findViewById(R.id.search_history_clear_button)
-        searchHistory = TrackSearchHistory(
-            getSharedPreferences(
-                PLAYLIST_MAKER_PREFERENCES,
-                MODE_PRIVATE
-            )
-        )
+        historyInteractor = Creator.provideTracksHistoryInteractor(this)
 
         adapter.tracks = tracks
         trackList.adapter = adapter
@@ -137,7 +131,7 @@ class SearchActivity : AppCompatActivity() {
         updateSearchHistoryList()
 
         searchHistoryClearButton.setOnClickListener {
-            searchHistory.clear()
+            historyInteractor.clearHistory()
             updateSearchHistoryList()
             searchHistoryBlock.isVisible = false
         }
@@ -151,33 +145,20 @@ class SearchActivity : AppCompatActivity() {
 
         showProgressBar()
 
-        tracksService.search(term).enqueue(object : Callback<SearchTracksResponse> {
-            @SuppressLint("NotifyDataSetChanged")
-            override fun onResponse(
-                call: Call<SearchTracksResponse?>,
-                response: Response<SearchTracksResponse?>
-            ) {
+        tracksInteractor.searchTracks(term) {
+            runOnUiThread {
                 hideProgressBar()
-                when (response.code()) {
-                    200 -> {
-                        val results = response.body()?.results
-                        if (results?.isEmpty() == true) {
-                            showNotFoundErrorMessage()
-                        } else {
-                            trackList.isVisible = true
-                            setTrackList(results!!)
-                        }
+                when (it) {
+                    is SearchResult.Success -> {
+                        trackList.isVisible = true
+                        setTrackList(it.tracks)
                     }
 
-                    else -> showNetworkErrorMessage()
+                    is SearchResult.Empty -> showNotFoundErrorMessage()
+                    is SearchResult.Error -> showNetworkErrorMessage()
                 }
             }
-
-            override fun onFailure(call: Call<SearchTracksResponse?>, t: Throwable) {
-                hideProgressBar()
-                showNetworkErrorMessage()
-            }
-        })
+        }
     }
 
     private fun loadTracks(delay: Long = SEARCH_DEBOUNCE_DELAY) {
@@ -202,7 +183,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setTrackList(newTracks: ArrayList<Track> = ArrayList()) {
+    fun setTrackList(newTracks: List<Track> = emptyList<Track>()) {
         networkErrorBlock.isVisible = false
         notFoundErrorBlock.isVisible = false
 
@@ -235,11 +216,13 @@ class SearchActivity : AppCompatActivity() {
     private fun clearButtonVisibility(s: CharSequence?) = !s.isNullOrEmpty()
 
     private fun searchHistoryBlockVisibility(s: CharSequence?, focus: Boolean) =
-        (focus && searchHistory.size != 0 && s.isNullOrEmpty())
+        (focus && !historyInteractor.isEmpty() && s.isNullOrEmpty())
 
     private fun updateSearchHistoryList() {
-        historyAdapter.tracks = searchHistory.getAll()
-        historyAdapter.notifyDataSetChanged()
+        historyInteractor.getSavedTracks {
+            historyAdapter.tracks = it
+            historyAdapter.notifyDataSetChanged()
+        }
     }
 
     private fun showProgressBar() {

@@ -17,6 +17,12 @@ import com.example.playlistmaker.settings.data.SharedPrefsSettingsClient
 import com.example.playlistmaker.settings.domain.SettingsInteractor
 import com.example.playlistmaker.settings.domain.SettingsRepository
 import com.example.playlistmaker.settings.domain.impl.SettingsInteractorImpl
+import com.example.playlistmaker.sharing.data.ExternalNavigator
+import com.example.playlistmaker.sharing.data.ExternalNavigatorImpl
+import com.example.playlistmaker.sharing.data.SharingRepositoryImpl
+import com.example.playlistmaker.sharing.domain.SharingInteractor
+import com.example.playlistmaker.sharing.domain.SharingRepository
+import com.example.playlistmaker.sharing.domain.impl.SharingInteractorImpl
 
 const val PLAYLIST_MAKER_PREFERENCES = "playlist_maker_preferences"
 
@@ -53,6 +59,20 @@ object Creator {
 
     fun provideSettingsInteractor(context: Context): SettingsInteractor {
         val repository = getSettingsRepository(context)
-        return SettingsInteractorImpl(context, repository)
+        return SettingsInteractorImpl(repository)
+    }
+
+    private fun getSharingRepository(context: Context): SharingRepository {
+        return SharingRepositoryImpl(context)
+    }
+
+    private fun getExternalNavigator(context: Context): ExternalNavigator {
+        return ExternalNavigatorImpl(context)
+    }
+
+    fun provideSharingInteractor(context: Context): SharingInteractor {
+        val repository = getSharingRepository(context)
+        val externalNavigator = getExternalNavigator(context)
+        return SharingInteractorImpl(externalNavigator, repository)
     }
 }

@@ -24,10 +24,7 @@ class SearchViewModel : ViewModel() {
     }
 
     fun onSearchTextChanged(s: CharSequence?) {
-        searchTerm = when (s.isNullOrEmpty()) {
-            true -> ""
-            else -> s.toString()
-        }
+        searchTerm = s?.toString().orEmpty()
         loadTracks()
     }
 

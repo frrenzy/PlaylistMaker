@@ -19,7 +19,7 @@ class PlayerViewModel(track: Track) : ViewModel() {
             playerStateLiveData.postValue(
                 PlayerState(
                     playerStateLiveData.value?.state ?: MediaState.DEFAULT,
-                    Track.trackTimeFormat.format(it),
+                    formatTime(it),
                     true
                 )
             )
@@ -31,7 +31,13 @@ class PlayerViewModel(track: Track) : ViewModel() {
     fun observeTrack(): LiveData<Track> = trackLiveData
 
     private val playerStateLiveData =
-        MutableLiveData(PlayerState(MediaState.DEFAULT, "00:00", false))
+        MutableLiveData(
+            PlayerState(
+                MediaState.DEFAULT,
+                formatTime(0),
+                false
+            )
+        )
 
     fun observePlayerState(): LiveData<PlayerState> = playerStateLiveData
 
@@ -54,7 +60,7 @@ class PlayerViewModel(track: Track) : ViewModel() {
         playerStateLiveData.postValue(
             PlayerState(
                 MediaState.PLAYING,
-                "00:00",
+                formatTime(0),
                 true,
             )
         )
@@ -66,7 +72,7 @@ class PlayerViewModel(track: Track) : ViewModel() {
         playerStateLiveData.postValue(
             PlayerState(
                 MediaState.PAUSED,
-                "00:00",
+                formatTime(0),
                 true,
             )
         )
@@ -79,7 +85,7 @@ class PlayerViewModel(track: Track) : ViewModel() {
             playerStateLiveData.postValue(
                 PlayerState(
                     MediaState.PREPARED,
-                    Track.trackTimeFormat.format(0),
+                    formatTime(0),
                     true,
                 )
             )
@@ -89,7 +95,7 @@ class PlayerViewModel(track: Track) : ViewModel() {
             playerStateLiveData.postValue(
                 PlayerState(
                     MediaState.PREPARED,
-                    Track.trackTimeFormat.format(0),
+                    formatTime(0),
                     true,
                 )
             )
@@ -105,6 +111,8 @@ class PlayerViewModel(track: Track) : ViewModel() {
         pausePlayer()
         player.release()
     }
+
+    private fun formatTime(time: Int): String = Track.trackTimeFormat.format(time)
 
     enum class MediaState {
         DEFAULT,

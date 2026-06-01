@@ -8,8 +8,12 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.settings.domain.SettingsInteractor
+import com.example.playlistmaker.sharing.domain.SharingInteractor
 
-class SettingsViewModel(private val settingsInteractor: SettingsInteractor) : ViewModel() {
+class SettingsViewModel(
+    private val settingsInteractor: SettingsInteractor,
+    private val sharingInteractor: SharingInteractor
+) : ViewModel() {
     private val darkLiveData = MutableLiveData(settingsInteractor.dark)
     fun observeIsDark(): LiveData<Boolean> = darkLiveData
 
@@ -18,15 +22,16 @@ class SettingsViewModel(private val settingsInteractor: SettingsInteractor) : Vi
         darkLiveData.postValue(isDark)
     }
 
-    fun shareApp(): Unit = settingsInteractor.shareApp()
-    fun sendSupportTicket(): Unit = settingsInteractor.sendSupportTicket()
-    fun openUserAgreement(): Unit = settingsInteractor.openUserAgreement()
+    fun shareApp(): Unit = sharingInteractor.shareApp()
+    fun sendSupportTicket(): Unit = sharingInteractor.openSupport()
+    fun openUserAgreement(): Unit = sharingInteractor.openTerms()
 
     companion object {
         fun getFactory(context: Context) = viewModelFactory {
             initializer {
-                val interactor = Creator.provideSettingsInteractor(context)
-                SettingsViewModel(interactor)
+                val settingsInteractor = Creator.provideSettingsInteractor(context)
+                val sharingInteractor = Creator.provideSharingInteractor(context)
+                SettingsViewModel(settingsInteractor, sharingInteractor)
             }
         }
     }

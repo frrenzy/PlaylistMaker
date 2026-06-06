@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.settings.SettingsActivity">
+    tools:context=".settings.ui.SettingsActivity">
 
     <LinearLayout
         style="@style/ScreenTitle"
@@ -15,7 +15,7 @@
         android:paddingTop="0dp">
 
         <ImageView
-            android:id="@+id/settings_back_button"
+            android:id="@+id/back_button"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginTop="4dp"
@@ -41,14 +41,14 @@
             android:text="@string/settings_theme" />
 
         <Switch
-            android:id="@+id/settings_theme_switcher"
+            android:id="@+id/theme_switcher"
             style="@style/SettingsLineContent"
             android:layout_gravity="end"
             android:paddingHorizontal="0dp" />
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/settings_share"
+        android:id="@+id/share_button"
         style="@style/SettingsLine"
         android:orientation="horizontal">
 
@@ -62,7 +62,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/settings_support"
+        android:id="@+id/support_button"
         style="@style/SettingsLine"
         android:orientation="horizontal">
 
@@ -76,7 +76,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/settings_agreement"
+        android:id="@+id/agreement_button"
         style="@style/SettingsLine"
         android:orientation="horizontal">
 

@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:theme="@style/Theme.PlaylistMaker.MainScreen"
-    tools:context=".ui.main.MainActivity">
+    tools:context=".main.ui.MainActivity">
 
     <TextView
         style="@style/ScreenTitle"

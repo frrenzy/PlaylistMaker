@@ -1,20 +1,14 @@
 package com.example.playlistmaker
 
 import android.app.Application
-import com.example.playlistmaker.domain.settings.SettingsInteractor
+import com.example.playlistmaker.creator.Creator
 
-const val THEME_PREFERENCES_KEY = "theme"
 const val PLAYER_TRACK_KEY = "player_track"
 
 class App : Application() {
-    var darkTheme = false
-    private lateinit var settingsInteractor: SettingsInteractor
-
     override fun onCreate() {
         super.onCreate()
 
-        settingsInteractor = Creator.provideSettingsInteractor(this)
-
-        settingsInteractor.setSavedTheme()
+        Creator.provideSettingsInteractor(this).setSavedTheme()
     }
 }

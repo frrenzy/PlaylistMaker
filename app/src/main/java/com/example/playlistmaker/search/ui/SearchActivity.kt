@@ -6,13 +6,11 @@ import android.os.Bundle
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
-import androidx.lifecycle.ViewModelProvider
 import com.example.playlistmaker.PLAYER_TRACK_KEY
 import com.example.playlistmaker.databinding.ActivitySearchBinding
 import com.example.playlistmaker.history.presentation.HistoryViewModel
@@ -21,11 +19,12 @@ import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.search.presentation.SearchState
 import com.example.playlistmaker.search.presentation.SearchViewModel
 import com.example.playlistmaker.utils.connectBackButton
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySearchBinding
-    private lateinit var historyViewModel: HistoryViewModel
-    private val searchViewModel: SearchViewModel by viewModels()
+    private val historyViewModel: HistoryViewModel by viewModel()
+    private val searchViewModel: SearchViewModel by viewModel()
 
     private val searchAdapter = TrackAdapter {
         historyViewModel.onTrackClick(it)
@@ -47,10 +46,6 @@ class SearchActivity : AppCompatActivity() {
         }
 
         connectBackButton(binding.backButton)
-
-        historyViewModel = ViewModelProvider(
-            this, HistoryViewModel.getFactory(this)
-        ).get(HistoryViewModel::class.java)
 
         historyViewModel.observeHistory().observe(this) {
             historyAdapter.tracks = it.tracks

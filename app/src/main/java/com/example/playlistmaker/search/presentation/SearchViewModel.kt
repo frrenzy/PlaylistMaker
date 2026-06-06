@@ -5,17 +5,15 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.search.domain.SearchResult
+import com.example.playlistmaker.search.domain.TracksInteractor
 import com.example.playlistmaker.search.domain.models.Track
 
-class SearchViewModel : ViewModel() {
+class SearchViewModel(private val searchInteractor: TracksInteractor) : ViewModel() {
     private val searchStateLiveData = MutableLiveData<SearchState>(SearchState.Default)
     fun observeSearchState(): LiveData<SearchState> = searchStateLiveData
 
     private var searchTerm = ""
-    private val searchInteractor = Creator.provideTracksInteractor()
-
     private val searchRunnable = Runnable { searchRequest() }
     private val handler = Handler(Looper.getMainLooper())
 

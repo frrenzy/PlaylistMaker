@@ -6,9 +6,11 @@ import com.example.playlistmaker.search.data.dto.TrackDto
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
-class SharedPrefsHistoryClient(val preferences: SharedPreferences, val maxDepth: Int = 10) :
-    HistoryClient {
-    private val gson = Gson()
+class SharedPrefsHistoryClient(
+    private val preferences: SharedPreferences,
+    private val gson: Gson,
+    private val maxDepth: Int = 10
+) : HistoryClient {
 
     override var size: Int = 0
         private set

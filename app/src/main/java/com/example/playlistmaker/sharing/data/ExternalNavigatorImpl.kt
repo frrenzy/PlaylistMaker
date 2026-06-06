@@ -8,13 +8,14 @@ import com.example.playlistmaker.sharing.domain.ExternalNavigator
 import com.example.playlistmaker.sharing.domain.model.EmailData
 
 class ExternalNavigatorImpl(private val context: Context) : ExternalNavigator {
-    override fun openEmail(data: EmailData) {
-        val shareIntent = Intent(Intent.ACTION_SENDTO)
-        shareIntent.data = "mailto:".toUri()
-        data.apply {
-            shareIntent.putExtra(Intent.EXTRA_EMAIL, addresses)
-            shareIntent.putExtra(Intent.EXTRA_SUBJECT, subject)
-            shareIntent.putExtra(Intent.EXTRA_TEXT, message)
+    override fun openEmail(email: EmailData) {
+        val shareIntent = Intent(Intent.ACTION_SENDTO).apply {
+            data = "mailto:".toUri()
+            putExtra(Intent.EXTRA_EMAIL, email.addresses)
+            putExtra(Intent.EXTRA_SUBJECT, email.subject)
+            putExtra(Intent.EXTRA_TEXT, email.message)
+
+            setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
 
         context.startActivity(shareIntent)
@@ -22,21 +23,25 @@ class ExternalNavigatorImpl(private val context: Context) : ExternalNavigator {
 
     override fun openLink(link: String) {
         val webpage = link.toUri()
-        val viewIntent = Intent(Intent.ACTION_VIEW, webpage)
+        val viewIntent = Intent(Intent.ACTION_VIEW, webpage).apply {
+            setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
 
         context.startActivity(viewIntent)
     }
 
     override fun shareLink(link: String) {
-        val shareIntent = Intent(Intent.ACTION_SEND)
-        shareIntent.setType("text/plain")
-        shareIntent.putExtra(Intent.EXTRA_TEXT, link)
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            setType("text/plain")
+            putExtra(Intent.EXTRA_TEXT, link)
+            setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
 
-        context.startActivity(
-            Intent.createChooser(
-                shareIntent,
-                context.getString(R.string.share_title)
-            )
-        )
+        val chooserIntent =
+            Intent.createChooser(shareIntent, context.getString(R.string.share_title)).apply {
+                setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+
+        context.startActivity(chooserIntent)
     }
 }

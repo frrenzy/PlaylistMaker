@@ -17,9 +17,9 @@ import com.example.playlistmaker.settings.data.SharedPrefsSettingsClient
 import com.example.playlistmaker.settings.domain.SettingsInteractor
 import com.example.playlistmaker.settings.domain.SettingsRepository
 import com.example.playlistmaker.settings.domain.impl.SettingsInteractorImpl
-import com.example.playlistmaker.sharing.data.ExternalNavigator
 import com.example.playlistmaker.sharing.data.ExternalNavigatorImpl
 import com.example.playlistmaker.sharing.data.SharingRepositoryImpl
+import com.example.playlistmaker.sharing.domain.ExternalNavigator
 import com.example.playlistmaker.sharing.domain.SharingInteractor
 import com.example.playlistmaker.sharing.domain.SharingRepository
 import com.example.playlistmaker.sharing.domain.impl.SharingInteractorImpl

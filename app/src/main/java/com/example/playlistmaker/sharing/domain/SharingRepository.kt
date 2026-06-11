@@ -7,9 +7,3 @@ interface SharingRepository {
     fun getShareAppLink(): String
     fun getTermsLink(): String
 }
-
-interface ExternalNavigator {
-    fun shareLink(link: String)
-    fun openLink(link: String)
-    fun openEmail(data: EmailData)
-}

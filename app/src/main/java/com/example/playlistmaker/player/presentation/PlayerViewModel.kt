@@ -6,9 +6,6 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.playlistmaker.search.domain.models.Track
 
 class PlayerViewModel(track: Track) : ViewModel() {
@@ -122,12 +119,6 @@ class PlayerViewModel(track: Track) : ViewModel() {
     }
 
     companion object {
-        fun getFactory(track: Track): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                PlayerViewModel(track)
-            }
-        }
-
         data class PlayerState(
             val state: MediaState,
             val progressTime: String,

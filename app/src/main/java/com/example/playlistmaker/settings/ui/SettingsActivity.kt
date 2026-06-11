@@ -5,15 +5,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.ViewModelProvider
 import com.example.playlistmaker.databinding.ActivitySettingsBinding
 import com.example.playlistmaker.settings.presentation.SettingsViewModel
 import com.example.playlistmaker.utils.connectBackButton
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
 
-    private lateinit var viewModel: SettingsViewModel
+    private val viewModel: SettingsViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,13 +27,6 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         connectBackButton(binding.backButton)
-
-        viewModel = ViewModelProvider(
-            this,
-            SettingsViewModel.getFactory(this)
-        ).get(
-            SettingsViewModel::class.java
-        )
 
         binding.apply {
             viewModel.observeIsDark().observe(this@SettingsActivity) {

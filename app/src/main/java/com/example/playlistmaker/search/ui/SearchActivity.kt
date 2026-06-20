@@ -5,10 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import com.example.playlistmaker.PLAYER_TRACK_KEY
@@ -18,11 +14,13 @@ import com.example.playlistmaker.player.ui.PlayerActivity
 import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.search.presentation.SearchState
 import com.example.playlistmaker.search.presentation.SearchViewModel
-import com.example.playlistmaker.utils.connectBackButton
+import com.example.playlistmaker.utils.BindingActivity
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SearchActivity : AppCompatActivity() {
-    private lateinit var binding: ActivitySearchBinding
+class SearchActivity : BindingActivity<ActivitySearchBinding>() {
+    override fun createBinding() = ActivitySearchBinding.inflate(layoutInflater)
+    override fun getBackButton() = binding.backButton
+
     private val historyViewModel: HistoryViewModel by viewModel()
     private val searchViewModel: SearchViewModel by viewModel()
 
@@ -36,16 +34,6 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        binding = ActivitySearchBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-
-        connectBackButton(binding.backButton)
 
         historyViewModel.observeHistory().observe(this) {
             historyAdapter.tracks = it.tracks

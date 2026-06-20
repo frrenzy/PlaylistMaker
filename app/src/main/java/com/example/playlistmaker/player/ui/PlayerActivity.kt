@@ -1,10 +1,6 @@
 package com.example.playlistmaker.player.ui
 
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -13,31 +9,22 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
 import com.example.playlistmaker.player.presentation.PlayerViewModel
 import com.example.playlistmaker.search.domain.models.Track
-import com.example.playlistmaker.utils.connectBackButton
+import com.example.playlistmaker.utils.BindingActivity
 import com.example.playlistmaker.utils.dp
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
-class PlayerActivity : AppCompatActivity() {
+class PlayerActivity : BindingActivity<ActivityPlayerBinding>() {
+    override fun createBinding() = ActivityPlayerBinding.inflate(layoutInflater)
+    override fun getBackButton() = binding.backButton
+
     private val viewModel: PlayerViewModel by viewModel {
         val track = intent.getParcelableExtra(PLAYER_TRACK_KEY, Track::class.java)
         parametersOf(track)
     }
 
-    private lateinit var binding: ActivityPlayerBinding
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        binding = ActivityPlayerBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-
-        connectBackButton(binding.backButton)
 
         viewModel.observeTrack().observe(this) {
             drawTrack(it)

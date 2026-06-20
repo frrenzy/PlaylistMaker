@@ -72,7 +72,7 @@
         <item name="android:textColor">@color/text_grey</item>
     </style>
 
-    <style name="SearchErrorBlock">
+    <style name="ErrorResultBlock">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">102dp</item>
@@ -82,18 +82,21 @@
         <item name="android:visibility">gone</item>
     </style>
 
-    <style name="SearchSection">
+    <style name="Info">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="Info.Image">
         <item name="android:paddingBottom">@dimen/padding_default</item>
     </style>
 
-    <style name="SearchSection.Text">
+    <style name="Info.Text">
         <item name="android:textAlignment">center</item>
         <item name="android:textSize">@dimen/font_size_error</item>
     </style>
 
-    <style name="SearchActionButton">
+    <style name="ActionButton">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:backgroundTint">@color/black</item>
@@ -132,5 +135,17 @@
 
     <style name="PlayerTrackInfo.Value">
         <item name="android:textAlignment">textEnd</item>
+    </style>
+
+    <style name="TabText" parent="TextAppearance.Design.Tab">
+        <item name="android:textAllCaps">false</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="Tabs" parent="Widget.Design.TabLayout">
+        <item name="tabTextColor">@color/black</item>
+        <item name="tabBackground">@color/white</item>
+        <item name="tabIndicatorColor">@color/black</item>
+        <item name="tabRippleColor">@null</item>
     </style>
 </resources>

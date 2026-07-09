@@ -1,13 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/library"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    app:layout_constraintVertical_chainStyle="packed"
     tools:context=".library.ui.LibraryActivity">
 
-    <TextView
-        android:layout_width="match_parent"
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/left_border"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="@dimen/padding_default" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/right_border"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="@dimen/padding_default" />
+
+    <LinearLayout
+        android:id="@+id/toolbar"
+        style="@style/ScreenTitle"
+        android:layout_margin="0dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="0dp"
+        app:layout_constraintBottom_toTopOf="@id/tabs"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/back_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="4dp"
+            android:src="@drawable/ic_arrow_back_48" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/padding_small"
+            android:paddingTop="@dimen/padding_default"
+            android:text="@string/library"
+            android:textFontWeight="500"
+            android:textSize="@dimen/font_size"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabs"
+        style="@style/Tabs"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Library" />
-</FrameLayout>
+        android:layout_margin="0dp"
+        app:layout_constraintBottom_toTopOf="@id/pager"
+        app:layout_constraintEnd_toEndOf="@id/right_border"
+        app:layout_constraintStart_toStartOf="@id/left_border"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:tabTextAppearance="@style/TabText" />
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/pager"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/right_border"
+        app:layout_constraintStart_toStartOf="@id/left_border"
+        app:layout_constraintTop_toBottomOf="@+id/tabs"
+        app:layout_constraintVertical_weight="1" />
+</androidx.constraintlayout.widget.ConstraintLayout>

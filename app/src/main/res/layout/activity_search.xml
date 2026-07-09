@@ -81,7 +81,7 @@
         tools:visibility="visible">
 
         <TextView
-            style="@style/SearchSection.Text"
+            style="@style/Info.Text"
             android:layout_gravity="center"
             android:layout_marginTop="@dimen/padding_section"
             android:paddingBottom="@dimen/padding_small"
@@ -96,7 +96,7 @@
 
         <Button
             android:id="@+id/search_history_clear_button"
-            style="@style/SearchActionButton"
+            style="@style/ActionButton"
             android:layout_gravity="center"
             android:layout_marginTop="@dimen/padding_section"
             android:text="@string/search_history_clear" />
@@ -120,36 +120,36 @@
 
     <LinearLayout
         android:id="@+id/network_error_block"
-        style="@style/SearchErrorBlock">
+        style="@style/ErrorResultBlock">
 
         <ImageView
-            style="@style/SearchSection"
+            style="@style/Info.Image"
             android:src="@drawable/ic_network_error_120" />
 
         <TextView
-            style="@style/SearchSection.Text"
+            style="@style/Info.Text"
             android:text="@string/network_error" />
 
         <TextView
-            style="@style/SearchSection.Text"
+            style="@style/Info.Text"
             android:text="@string/network_error_hint" />
 
         <Button
             android:id="@+id/reload_button"
-            style="@style/SearchActionButton"
+            style="@style/ActionButton"
             android:text="@string/reload" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/not_found_error_block"
-        style="@style/SearchErrorBlock">
+        style="@style/ErrorResultBlock">
 
         <ImageView
-            style="@style/SearchSection"
+            style="@style/Info.Image"
             android:src="@drawable/ic_not_found_120" />
 
         <TextView
-            style="@style/SearchSection.Text"
+            style="@style/Info.Text"
             android:text="@string/not_found_error" />
     </LinearLayout>
 

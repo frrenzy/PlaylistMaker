@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/favourites"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".library.ui.FavouritesFragment">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/track_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/empty_block"
+        style="@style/ErrorResultBlock">
+
+        <ImageView
+            style="@style/Info.Image"
+            android:src="@drawable/ic_not_found_120" />
+
+        <TextView
+            style="@style/Info.Text"
+            android:text="@string/library_favourites_empty" />
+    </LinearLayout>
+</FrameLayout>

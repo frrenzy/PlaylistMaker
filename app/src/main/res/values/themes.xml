@@ -17,11 +17,6 @@
         <item name="colorAccent">@color/blue</item>
     </style>
 
-    <style name="Theme.PlaylistMaker.MainScreen" parent="Base.Theme.PlaylistMaker">
-        <item name="android:background">@color/blue</item>
-        <item name="iconColor">@color/black</item>
-    </style>
-
     <style name="Theme.PlaylistMaker.NavIcons" parent="Base.Theme.PlaylistMaker">
         <item name="iconColor">@color/black</item>
     </style>

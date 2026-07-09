@@ -1,28 +1,34 @@
 package com.example.playlistmaker.search.ui
 
 import android.annotation.SuppressLint
-import android.content.Intent
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
-import com.example.playlistmaker.PLAYER_TRACK_KEY
-import com.example.playlistmaker.databinding.ActivitySearchBinding
+import androidx.navigation.fragment.findNavController
+import com.example.playlistmaker.R
+import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.history.presentation.HistoryViewModel
-import com.example.playlistmaker.player.ui.PlayerActivity
+import com.example.playlistmaker.player.ui.PlayerFragment
 import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.search.presentation.SearchState
 import com.example.playlistmaker.search.presentation.SearchViewModel
-import com.example.playlistmaker.utils.BindingActivity
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import com.example.playlistmaker.utils.BindingFragment
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
-class SearchActivity : BindingActivity<ActivitySearchBinding>() {
-    override fun createBinding() = ActivitySearchBinding.inflate(layoutInflater)
-    override fun getBackButton() = binding.backButton
+class SearchFragment : BindingFragment<FragmentSearchBinding>() {
+    override fun createBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ) = FragmentSearchBinding.inflate(inflater, container, false)
 
-    private val historyViewModel: HistoryViewModel by viewModel()
-    private val searchViewModel: SearchViewModel by viewModel()
+    private val historyViewModel: HistoryViewModel by activityViewModel()
+    private val searchViewModel: SearchViewModel by activityViewModel()
 
     private val searchAdapter = TrackAdapter {
         historyViewModel.onTrackClick(it)
@@ -32,16 +38,18 @@ class SearchActivity : BindingActivity<ActivitySearchBinding>() {
         openPlayer(it)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    private var searchTerm = ""
 
-        historyViewModel.observeHistory().observe(this) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        historyViewModel.observeHistory().observe(viewLifecycleOwner) {
             historyAdapter.tracks = it.tracks
             binding.searchHistoryBlock.isVisible = it.isVisible
             historyAdapter.notifyDataSetChanged()
         }
 
-        searchViewModel.observeSearchState().observe(this) {
+        searchViewModel.observeSearchState().observe(viewLifecycleOwner) {
             when (it) {
                 is SearchState.Default -> setTrackList()
                 is SearchState.Error -> showNetworkErrorMessage()
@@ -58,6 +66,7 @@ class SearchActivity : BindingActivity<ActivitySearchBinding>() {
                 searchClearButton.isVisible = clearButtonVisibility(s)
                 historyViewModel.onSearchTextChanged(s)
                 searchViewModel.onSearchTextChanged(s)
+                searchTerm = s?.toString().orEmpty()
             }
 
             searchField.setOnEditorActionListener { _, actionId, _ ->
@@ -90,6 +99,8 @@ class SearchActivity : BindingActivity<ActivitySearchBinding>() {
             searchHistoryClearButton.setOnClickListener {
                 historyViewModel.onClear()
             }
+
+            searchField.setText(searchTerm)
         }
     }
 
@@ -119,19 +130,6 @@ class SearchActivity : BindingActivity<ActivitySearchBinding>() {
         searchAdapter.notifyDataSetChanged()
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        outState.putString(SEARCH_TEXT, binding.searchField.text.toString())
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-
-        val search = savedInstanceState.getString(SEARCH_TEXT, SEARCH_DEFAULT)
-        binding.searchField.setText(search)
-    }
-
     private fun clearButtonVisibility(s: CharSequence?) = !s.isNullOrEmpty()
 
     private fun showProgressBar() {
@@ -151,15 +149,15 @@ class SearchActivity : BindingActivity<ActivitySearchBinding>() {
 
     private fun hideKeyboard() {
         val inputMethodManager =
-            getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
-        inputMethodManager?.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
+            activity?.getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
+        inputMethodManager?.hideSoftInputFromWindow(activity?.currentFocus?.windowToken, 0)
     }
 
     private fun openPlayer(track: Track) {
-        val intent = Intent(this@SearchActivity, PlayerActivity::class.java)
-        intent.putExtra(PLAYER_TRACK_KEY, track)
-
-        startActivity(intent)
+        findNavController().navigate(
+            R.id.action_searchFragment_to_playerFragment,
+            PlayerFragment.createArgs(track)
+        )
     }
 
     companion object {

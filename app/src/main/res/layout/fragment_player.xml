@@ -131,7 +131,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/padding_default"
-            android:text="@string/default_player_time"
             app:layout_constraintEnd_toStartOf="@id/right_border"
             app:layout_constraintStart_toEndOf="@id/left_border"
             app:layout_constraintTop_toBottomOf="@id/play_button" />

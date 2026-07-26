@@ -3,24 +3,20 @@ package com.example.playlistmaker.search.domain.impl
 import com.example.playlistmaker.search.domain.SearchResult
 import com.example.playlistmaker.search.domain.TracksInteractor
 import com.example.playlistmaker.search.domain.TracksRepository
-import java.util.concurrent.Executors
+import com.example.playlistmaker.utils.network.Resource
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class TracksInteractorImpl(private val repository: TracksRepository) : TracksInteractor {
-    private val executor = Executors.newCachedThreadPool()
-
-    override fun searchTracks(term: String, consumer: TracksInteractor.TracksConsumer) {
-        var result: SearchResult
-        executor.execute {
-            try {
-                val tracks = repository.searchTracks(term)
-                result = when (tracks.isEmpty()) {
-                    true -> SearchResult.Empty
-                    else -> SearchResult.Success(tracks)
+    override fun searchTracks(term: String): Flow<SearchResult> =
+        repository.searchTracks(term).map {
+            when (it) {
+                is Resource.Error -> SearchResult.Error(it.message ?: "Ошибка сервера")
+                is Resource.Success -> {
+                    if (it.data.isNullOrEmpty()) {
+                        SearchResult.Empty
+                    } else SearchResult.Success(it.data)
                 }
-            } catch (e: Exception) {
-                result = SearchResult.Error(e.message ?: "unexpected network error")
             }
-            consumer.consume(result)
         }
-    }
 }

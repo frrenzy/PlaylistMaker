@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlayerBinding
+import com.example.playlistmaker.player.presentation.PlayerState
 import com.example.playlistmaker.player.presentation.PlayerViewModel
 import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.utils.BindingFragment
@@ -41,18 +42,7 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
             drawTrack(it)
         }
         viewModel.observePlayerState().observe(viewLifecycleOwner) {
-            binding.apply {
-                playButton.isEnabled = it.isPlayButtonEnabled
-                playTime.text = it.progressTime
-                playButton.background = when (it.state) {
-                    PlayerViewModel.MediaState.PLAYING -> getDrawable(
-                        requireActivity(),
-                        R.drawable.pause_button
-                    )
-
-                    else -> getDrawable(requireActivity(), R.drawable.play_button)
-                }
-            }
+            renderPlayer(it)
         }
         binding.playButton.setOnClickListener {
             viewModel.onPlayButtonClick()
@@ -94,6 +84,21 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
                 .centerCrop()
                 .transform(RoundedCorners(TRACK_ART_CORNER_RADIUS.dp))
                 .into(trackCover)
+        }
+    }
+
+    private fun renderPlayer(state: PlayerState) {
+        binding.apply {
+            playButton.isEnabled = state.isPlayButtonEnabled
+            playTime.text = state.progressTime
+            playButton.background = when (state) {
+                is PlayerState.Playing -> getDrawable(
+                    requireActivity(),
+                    R.drawable.pause_button
+                )
+
+                else -> getDrawable(requireActivity(), R.drawable.play_button)
+            }
         }
     }
 

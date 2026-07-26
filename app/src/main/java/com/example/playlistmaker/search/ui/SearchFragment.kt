@@ -40,6 +40,7 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
 
     private var searchTerm = ""
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -158,10 +159,5 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
             R.id.action_searchFragment_to_playerFragment,
             PlayerFragment.createArgs(track)
         )
-    }
-
-    companion object {
-        const val SEARCH_TEXT = "SEARCH_TEXT"
-        const val SEARCH_DEFAULT = ""
     }
 }

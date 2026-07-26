@@ -1,46 +1,65 @@
 package com.example.playlistmaker.player.ui
 
+import android.os.Build
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.view.isVisible
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.example.playlistmaker.PLAYER_TRACK_KEY
 import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.ActivityPlayerBinding
+import com.example.playlistmaker.databinding.FragmentPlayerBinding
 import com.example.playlistmaker.player.presentation.PlayerViewModel
 import com.example.playlistmaker.search.domain.models.Track
-import com.example.playlistmaker.utils.BindingActivity
+import com.example.playlistmaker.utils.BindingFragment
 import com.example.playlistmaker.utils.dp
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
-class PlayerActivity : BindingActivity<ActivityPlayerBinding>() {
-    override fun createBinding() = ActivityPlayerBinding.inflate(layoutInflater)
-    override fun getBackButton() = binding.backButton
-
+class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
     private val viewModel: PlayerViewModel by viewModel {
-        val track = intent.getParcelableExtra(PLAYER_TRACK_KEY, Track::class.java)
+        val track = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requireArguments().getParcelable(PLAYER_TRACK_KEY, Track::class.java)
+        } else {
+            requireArguments().getParcelable(PLAYER_TRACK_KEY)
+        }
         parametersOf(track)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun createBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ) = FragmentPlayerBinding.inflate(inflater, container, false)
 
-        viewModel.observeTrack().observe(this) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewModel.observeTrack().observe(viewLifecycleOwner) {
             drawTrack(it)
         }
-        viewModel.observePlayerState().observe(this) {
+        viewModel.observePlayerState().observe(viewLifecycleOwner) {
             binding.apply {
                 playButton.isEnabled = it.isPlayButtonEnabled
                 playTime.text = it.progressTime
                 playButton.background = when (it.state) {
-                    PlayerViewModel.MediaState.PLAYING -> getDrawable(R.drawable.pause_button)
-                    else -> getDrawable(R.drawable.play_button)
+                    PlayerViewModel.MediaState.PLAYING -> getDrawable(
+                        requireActivity(),
+                        R.drawable.pause_button
+                    )
+
+                    else -> getDrawable(requireActivity(), R.drawable.play_button)
                 }
             }
         }
         binding.playButton.setOnClickListener {
             viewModel.onPlayButtonClick()
+        }
+
+        binding.backButton.setOnClickListener {
+            findNavController().navigateUp()
         }
     }
 
@@ -69,7 +88,7 @@ class PlayerActivity : BindingActivity<ActivityPlayerBinding>() {
                 trackAlbumGroup.isVisible = false
             }
 
-            Glide.with(this@PlayerActivity)
+            Glide.with(this@PlayerFragment)
                 .load(track.coverArtworkUrl)
                 .placeholder(R.drawable.ic_placeholder_45)
                 .centerCrop()
@@ -79,6 +98,11 @@ class PlayerActivity : BindingActivity<ActivityPlayerBinding>() {
     }
 
     companion object {
-        const val TRACK_ART_CORNER_RADIUS = 8
+        private const val TRACK_ART_CORNER_RADIUS = 8
+        private const val PLAYER_TRACK_KEY = "track"
+
+        fun createArgs(track: Track) = Bundle().apply {
+            putParcelable(PLAYER_TRACK_KEY, track)
+        }
     }
 }

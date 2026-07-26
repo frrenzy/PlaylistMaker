@@ -13,8 +13,6 @@ import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
-const val PLAYER_TRACK_KEY = "player_track"
-
 class App : Application() {
     private val settingsInteractor: SettingsInteractor by inject()
 

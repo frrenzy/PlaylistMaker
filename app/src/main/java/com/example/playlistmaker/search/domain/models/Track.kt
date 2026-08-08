@@ -25,5 +25,6 @@ data class Track(
 
     companion object {
         val trackTimeFormat = SimpleDateFormat("mm:ss", Locale.getDefault())
+        val DEFAULT_TRACK_TIME = trackTimeFormat.format(0)
     }
 }

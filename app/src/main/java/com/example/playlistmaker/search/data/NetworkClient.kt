@@ -1,8 +1,8 @@
 package com.example.playlistmaker.search.data
 
-import com.example.playlistmaker.search.data.dto.Response
 import com.example.playlistmaker.search.data.dto.TracksSearchRequest
+import com.example.playlistmaker.utils.network.Response
 
 interface NetworkClient {
-    fun searchTracks(dto: TracksSearchRequest): Response
+    suspend fun searchTracks(dto: TracksSearchRequest): Response
 }

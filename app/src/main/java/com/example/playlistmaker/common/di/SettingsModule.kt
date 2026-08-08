@@ -1,4 +1,4 @@
-package com.example.playlistmaker.di
+package com.example.playlistmaker.common.di
 
 import com.example.playlistmaker.settings.data.SettingsClient
 import com.example.playlistmaker.settings.data.SettingsRepositoryImpl

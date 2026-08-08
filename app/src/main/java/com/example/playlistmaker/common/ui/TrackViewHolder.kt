@@ -1,4 +1,4 @@
-package com.example.playlistmaker.search.ui
+package com.example.playlistmaker.common.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -6,8 +6,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
+import com.example.playlistmaker.common.domain.models.Track
 import com.example.playlistmaker.databinding.TrackCardBinding
-import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.utils.dp
 
 class TrackViewHolder(private val binding: TrackCardBinding) :

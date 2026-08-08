@@ -1,5 +1,6 @@
-package com.example.playlistmaker.search.domain.models
+package com.example.playlistmaker.common.domain.models
 
+import android.annotation.SuppressLint
 import android.icu.text.SimpleDateFormat
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
@@ -18,13 +19,16 @@ data class Track(
     val country: String,
     val previewUrl: String,
     val coverArtworkUrl: String?,
-    val year: String?,
+    val isFavourite: Boolean = false,
 ) : Parcelable {
     val trackTime: String
         get() = trackTimeFormat.format(trackTimeMillis)
+    val year: String?
+        get() = releaseDate?.substringBefore('-')
 
     companion object {
+        @SuppressLint("ConstantLocale")
         val trackTimeFormat = SimpleDateFormat("mm:ss", Locale.getDefault())
-        val DEFAULT_TRACK_TIME = trackTimeFormat.format(0)
+        val DEFAULT_TRACK_TIME: String = trackTimeFormat.format(0)
     }
 }

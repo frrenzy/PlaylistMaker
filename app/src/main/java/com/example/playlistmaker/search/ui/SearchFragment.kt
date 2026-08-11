@@ -12,10 +12,11 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.navigation.fragment.findNavController
 import com.example.playlistmaker.R
+import com.example.playlistmaker.common.domain.models.Track
+import com.example.playlistmaker.common.ui.TrackAdapter
 import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.history.presentation.HistoryViewModel
 import com.example.playlistmaker.player.ui.PlayerFragment
-import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.search.presentation.SearchState
 import com.example.playlistmaker.search.presentation.SearchViewModel
 import com.example.playlistmaker.utils.BindingFragment

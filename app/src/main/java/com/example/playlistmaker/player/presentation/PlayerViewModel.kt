@@ -5,18 +5,24 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.playlistmaker.search.domain.models.Track
+import com.example.playlistmaker.common.data.db.AppDatabase
+import com.example.playlistmaker.common.domain.models.Track
+import com.example.playlistmaker.library.domain.FavouriteTracksInteractor
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
-class PlayerViewModel(track: Track) : ViewModel() {
+class PlayerViewModel(
+    track: Track,
+    private val favouritesInteractor: FavouriteTracksInteractor,
+    private val db: AppDatabase,
+) : ViewModel() {
     private val player = MediaPlayer()
 
     private var updateTimer: Job? = null
 
-    private val trackLiveData = MutableLiveData(track)
+    private val trackLiveData = MutableLiveData<Track>()
     fun observeTrack(): LiveData<Track> = trackLiveData
 
     private val playerStateLiveData = MutableLiveData<PlayerState>(PlayerState.Default)
@@ -24,6 +30,12 @@ class PlayerViewModel(track: Track) : ViewModel() {
 
     init {
         preparePlayer(track.previewUrl)
+        viewModelScope.launch {
+            val favouriteTrackIds = db.favouriteTracksDao().getTrackIds()
+            val isTrackInFavourite = favouriteTrackIds.contains(track.trackId)
+
+            trackLiveData.postValue(track.copy(isFavourite = isTrackInFavourite))
+        }
     }
 
     fun onPlayButtonClick() {
@@ -31,6 +43,20 @@ class PlayerViewModel(track: Track) : ViewModel() {
             is PlayerState.Playing -> pausePlayer()
             is PlayerState.Prepared, is PlayerState.Paused -> startPlayer()
             else -> Unit
+        }
+    }
+
+    fun onLikeButtonClick() {
+        val track = trackLiveData.value ?: return
+
+        viewModelScope.launch {
+            if (track.isFavourite) {
+                favouritesInteractor.removeTrack(track)
+                trackLiveData.postValue(track.copy(isFavourite = false))
+            } else {
+                favouritesInteractor.addTrack(track)
+                trackLiveData.postValue(track.copy(isFavourite = true))
+            }
         }
     }
 
@@ -59,6 +85,7 @@ class PlayerViewModel(track: Track) : ViewModel() {
     }
 
     private fun startTimer() {
+        updateTimer?.cancel()
         updateTimer = viewModelScope.launch {
             while (player.isPlaying) {
                 delay(TRACK_TIME_UPDATE_INTERVAL)

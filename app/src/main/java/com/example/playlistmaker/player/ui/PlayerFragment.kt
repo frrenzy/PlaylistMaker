@@ -11,10 +11,10 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
+import com.example.playlistmaker.common.domain.models.Track
 import com.example.playlistmaker.databinding.FragmentPlayerBinding
 import com.example.playlistmaker.player.presentation.PlayerState
 import com.example.playlistmaker.player.presentation.PlayerViewModel
-import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.utils.BindingFragment
 import com.example.playlistmaker.utils.dp
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -44,8 +44,12 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
         viewModel.observePlayerState().observe(viewLifecycleOwner) {
             renderPlayer(it)
         }
+
         binding.playButton.setOnClickListener {
             viewModel.onPlayButtonClick()
+        }
+        binding.likeButton.setOnClickListener {
+            viewModel.onLikeButtonClick()
         }
 
         binding.backButton.setOnClickListener {
@@ -77,6 +81,11 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
             } ?: run {
                 trackAlbumGroup.isVisible = false
             }
+
+            if (track.isFavourite) likeButton.setImageResource(R.drawable.ic_like_active_25)
+            else likeButton.setImageResource(
+                R.drawable.ic_like_inactive_25
+            )
 
             Glide.with(this@PlayerFragment)
                 .load(track.coverArtworkUrl)

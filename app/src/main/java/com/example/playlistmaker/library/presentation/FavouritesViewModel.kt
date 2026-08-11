@@ -3,11 +3,30 @@ package com.example.playlistmaker.library.presentation
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.playlistmaker.search.domain.models.Track
+import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker.common.domain.models.Track
+import com.example.playlistmaker.library.domain.FavouriteTracksInteractor
+import kotlinx.coroutines.launch
 
-class FavouritesViewModel : ViewModel() {
-    private var favouritesLiveData = MutableLiveData<FavouritesState>(FavouritesState.Empty)
+class FavouritesViewModel(private val favouritesInteractor: FavouriteTracksInteractor) :
+    ViewModel() {
+    private var favouritesLiveData = MutableLiveData<FavouritesState>()
     fun observeFavouritesState(): LiveData<FavouritesState> = favouritesLiveData
+
+    init {
+        loadTracks()
+    }
+
+    fun loadTracks() {
+        viewModelScope.launch {
+            favouritesInteractor.getTracks().collect {
+                val state = if (it.isEmpty()) FavouritesState.Empty
+                else FavouritesState.Tracks(it)
+
+                favouritesLiveData.postValue(state)
+            }
+        }
+    }
 }
 
 sealed interface FavouritesState {

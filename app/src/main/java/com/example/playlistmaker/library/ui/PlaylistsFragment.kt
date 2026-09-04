@@ -13,6 +13,8 @@ import com.example.playlistmaker.library.domain.models.Playlist
 import com.example.playlistmaker.library.presentation.PlaylistsState
 import com.example.playlistmaker.library.presentation.PlaylistsViewModel
 import com.example.playlistmaker.utils.BindingFragment
+import com.example.playlistmaker.utils.GridSpacingItemDecoration
+import com.example.playlistmaker.utils.dp
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class PlaylistsFragment : BindingFragment<FragmentPlaylistsBinding>() {
@@ -39,6 +41,7 @@ class PlaylistsFragment : BindingFragment<FragmentPlaylistsBinding>() {
         }
 
         binding.playlistList.adapter = playlistsAdapter
+        binding.playlistList.addItemDecoration(GridSpacingItemDecoration(2, 8.dp, false))
     }
 
     private fun renderState(state: PlaylistsState) {

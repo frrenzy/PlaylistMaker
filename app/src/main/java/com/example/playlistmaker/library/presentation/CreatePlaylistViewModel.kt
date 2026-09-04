@@ -15,7 +15,9 @@ import com.example.playlistmaker.common.data.Constants
 import com.example.playlistmaker.library.domain.PlaylistsInteractor
 import com.example.playlistmaker.library.domain.models.Playlist
 import com.example.playlistmaker.utils.Event
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 
@@ -62,6 +64,10 @@ class CreatePlaylistViewModel(
                             .getString(R.string.playlist_creation_success)
                     )
                 )
+                name = ""
+                description = ""
+                coverPath = null
+                update()
             }
         }
     }
@@ -70,25 +76,33 @@ class CreatePlaylistViewModel(
         validityState.postValue(name.isNotEmpty())
     }
 
-    private fun saveImageToPrivateStorage(uri: Uri?, name: String): String? {
-        if (uri == null) return null
+    private suspend fun saveImageToPrivateStorage(uri: Uri?, name: String): String? {
+        withContext(Dispatchers.IO) {
+            if (uri == null) return@withContext null
 
-        //создаём экземпляр класса File, который указывает на нужный каталог
-        val filePath =
-            File(
-                getApplication<App>().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-                Constants.COVERS_DIR,
-            )
-        if (!filePath.exists()) {
-            filePath.mkdirs()
+            //создаём экземпляр класса File, который указывает на нужный каталог
+            val filePath =
+                File(
+                    getApplication<App>().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+                    Constants.COVERS_DIR,
+                )
+            if (!filePath.exists()) {
+                filePath.mkdirs()
+            }
+            val file = File(filePath, "${name.trim()}.jpg")
+
+            getApplication<App>().contentResolver.openInputStream(uri).use { input ->
+                FileOutputStream(file).use { output ->
+                    val decodedStream =
+                        BitmapFactory.decodeStream(input) ?: return@withContext null
+                    decodedStream.compress(Bitmap.CompressFormat.JPEG, 30, output)
+
+                }
+            }
+
+            return@withContext file.name
         }
-        val file = File(filePath, "${name.trim()}.jpg")
-        val inputStream = getApplication<App>().contentResolver.openInputStream(uri)
-        val outputStream = FileOutputStream(file)
-        BitmapFactory
-            .decodeStream(inputStream)
-            .compress(Bitmap.CompressFormat.JPEG, 30, outputStream)
 
-        return file.name
+        return null
     }
 }

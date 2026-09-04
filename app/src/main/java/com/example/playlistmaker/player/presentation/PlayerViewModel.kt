@@ -1,12 +1,10 @@
 package com.example.playlistmaker.player.presentation
 
-import android.app.Application
 import android.media.MediaPlayer
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.playlistmaker.App
 import com.example.playlistmaker.R
 import com.example.playlistmaker.common.data.db.AppDatabase
 import com.example.playlistmaker.common.domain.models.Track
@@ -22,11 +20,10 @@ import kotlin.time.Duration.Companion.milliseconds
 
 class PlayerViewModel(
     track: Track,
-    app: Application,
     private val favouritesInteractor: FavouriteTracksInteractor,
     private val playlistsInteractor: PlaylistsInteractor,
     private val db: AppDatabase,
-) : AndroidViewModel(app) {
+) : ViewModel() {
     private val player = MediaPlayer()
 
     private var updateTimer: Job? = null
@@ -51,7 +48,6 @@ class PlayerViewModel(
 
             trackLiveData.postValue(track.copy(isFavourite = isTrackInFavourite))
         }
-        loadPlaylists()
     }
 
     fun onPlayButtonClick() {
@@ -89,17 +85,13 @@ class PlayerViewModel(
             playlistsInteractor.addTrackToPlaylist(playlist.id, track).collect {
                 val result = when (it) {
                     is CreateResult.AlreadyExists -> AddTrackToPlaylistResult.Error(
-                        getApplication<App>().getString(
-                            R.string.track_already_in_playlist,
-                            playlist.name
-                        )
+                        R.string.track_already_in_playlist,
+                        playlist.name
                     )
 
                     is CreateResult.Success -> AddTrackToPlaylistResult.Success(
-                        getApplication<App>().getString(
-                            R.string.add_track_to_playlist_success,
-                            playlist.name
-                        )
+                        R.string.add_track_to_playlist_success,
+                        playlist.name
                     )
                 }
 
@@ -173,7 +165,7 @@ sealed class PlayerState(val isPlayButtonEnabled: Boolean, val progressTime: Str
     class Paused(progress: String) : PlayerState(true, progress)
 }
 
-sealed class AddTrackToPlaylistResult(val message: String) {
-    class Success(m: String) : AddTrackToPlaylistResult(m)
-    class Error(m: String) : AddTrackToPlaylistResult(m)
+sealed class AddTrackToPlaylistResult(val stringId: Int, val arg: String) {
+    class Success(r: Int, a: String) : AddTrackToPlaylistResult(r, a)
+    class Error(r: Int, a: String) : AddTrackToPlaylistResult(r, a)
 }

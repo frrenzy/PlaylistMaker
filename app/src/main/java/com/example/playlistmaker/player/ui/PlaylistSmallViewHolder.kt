@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.common.data.Constants
@@ -28,8 +29,7 @@ class PlaylistSmallViewHolder(private val binding: PlaylistSmallCardBinding) :
             Glide.with(root)
                 .load(file)
                 .placeholder(R.drawable.ic_placeholder_45)
-                .fitCenter()
-                .transform(RoundedCorners(PLAYLIST_COVER_CORNER_RADIUS.dp))
+                .transform(CenterCrop(), RoundedCorners(PLAYLIST_COVER_CORNER_RADIUS.dp))
                 .into(cover)
             name.text = model.name
             amount.text =

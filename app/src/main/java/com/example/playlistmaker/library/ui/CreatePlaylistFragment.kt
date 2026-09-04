@@ -63,7 +63,7 @@ class CreatePlaylistFragment : BindingFragment<FragmentCreatePlaylistBinding>() 
                 exit()
             }
 
-        requireActivity().onBackPressedDispatcher.addCallback {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             if (findNavController().currentDestination?.id == R.id.createPlaylistFragment)
                 exitWithConfirmation()
         }

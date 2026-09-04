@@ -75,7 +75,11 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
                     viewModel.loadPlaylists()
                 }
 
-                Toast.makeText(requireActivity(), it.message, Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    requireActivity(),
+                    requireActivity().getString(it.stringId, it.arg),
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
 
@@ -115,10 +119,15 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
 
             addButton.setOnClickListener {
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                viewModel.loadPlaylists()
             }
 
             newPlaylistButton.setOnClickListener {
                 findNavController().navigate(R.id.action_playerFragment_to_createPlaylistFragment)
+            }
+
+            overlay.setOnClickListener {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             }
 
             playlistsList.adapter = playlistsAdapter

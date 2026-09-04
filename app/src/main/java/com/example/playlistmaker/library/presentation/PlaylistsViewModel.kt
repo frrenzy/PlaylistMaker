@@ -14,10 +14,6 @@ class PlaylistsViewModel(
     private var playlistsLiveData = MutableLiveData<PlaylistsState>(PlaylistsState.Empty)
     fun observePlaylistsState(): LiveData<PlaylistsState> = playlistsLiveData
 
-    init {
-        loadPlaylists()
-    }
-
     fun loadPlaylists() {
         viewModelScope.launch {
             playlistsInteractor.getPlaylists().collect {

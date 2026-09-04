@@ -1,22 +1,28 @@
 package com.example.playlistmaker.player.ui
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.view.isVisible
+import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
+import com.example.playlistmaker.common.data.Constants
 import com.example.playlistmaker.common.domain.models.Track
 import com.example.playlistmaker.databinding.FragmentPlayerBinding
+import com.example.playlistmaker.player.presentation.AddTrackToPlaylistResult
 import com.example.playlistmaker.player.presentation.PlayerState
 import com.example.playlistmaker.player.presentation.PlayerViewModel
 import com.example.playlistmaker.utils.BindingFragment
 import com.example.playlistmaker.utils.dp
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
@@ -30,30 +36,92 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
         parametersOf(track)
     }
 
+    private val playlistsAdapter = PlaylistsSmallAdapter {
+        viewModel.onPlaylistClick(it)
+    }
+
     override fun createBinding(
         inflater: LayoutInflater,
         container: ViewGroup?
     ) = FragmentPlayerBinding.inflate(inflater, container, false)
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet).apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+        }
 
         viewModel.observeTrack().observe(viewLifecycleOwner) {
             drawTrack(it)
         }
+
         viewModel.observePlayerState().observe(viewLifecycleOwner) {
             renderPlayer(it)
         }
 
-        binding.playButton.setOnClickListener {
-            viewModel.onPlayButtonClick()
+        viewModel.observePlaylists().observe(viewLifecycleOwner) {
+            playlistsAdapter.playlists = it
+            playlistsAdapter.notifyDataSetChanged()
         }
-        binding.likeButton.setOnClickListener {
-            viewModel.onLikeButtonClick()
+        viewModel.loadPlaylists()
+
+        viewModel.observeMessage().observe(viewLifecycleOwner) { message ->
+            message.getContentIfNotHandled()?.let {
+                if (it is AddTrackToPlaylistResult.Success) {
+                    binding.overlay.isVisible = false
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                    viewModel.loadPlaylists()
+                }
+
+                Toast.makeText(requireActivity(), it.message, Toast.LENGTH_LONG).show()
+            }
         }
 
-        binding.backButton.setOnClickListener {
-            findNavController().navigateUp()
+        with(binding) {
+            playButton.setOnClickListener {
+                viewModel.onPlayButtonClick()
+            }
+
+            likeButton.setOnClickListener {
+                viewModel.onLikeButtonClick()
+            }
+
+            backButton.setOnClickListener {
+                findNavController().navigateUp()
+            }
+
+            setFragmentResultListener(Constants.CREATION_RESULT) { _, _ ->
+                bottomSheetBehavior.state =
+                    BottomSheetBehavior.STATE_COLLAPSED
+                overlay.alpha = slideToOverlayAlpha(0f)
+                overlay.isVisible = true
+            }
+
+            bottomSheetBehavior.addBottomSheetCallback(object :
+                BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(sheet: View, newState: Int) {
+                    when (newState) {
+                        BottomSheetBehavior.STATE_HIDDEN -> overlay.isVisible = false
+                        else -> overlay.isVisible = true
+                    }
+                }
+
+                override fun onSlide(sheet: View, slideOffset: Float) {
+                    overlay.alpha = slideToOverlayAlpha(slideOffset)
+                }
+            })
+
+            addButton.setOnClickListener {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+
+            newPlaylistButton.setOnClickListener {
+                findNavController().navigate(R.id.action_playerFragment_to_createPlaylistFragment)
+            }
+
+            playlistsList.adapter = playlistsAdapter
         }
     }
 
@@ -110,6 +178,8 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
             }
         }
     }
+
+    private fun slideToOverlayAlpha(slide: Float) = (slide + 1f) / 2
 
     companion object {
         private const val TRACK_ART_CORNER_RADIUS = 8

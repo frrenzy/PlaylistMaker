@@ -1,5 +1,9 @@
 package com.example.playlistmaker.library.domain.models
 
-import com.example.playlistmaker.common.domain.models.Track
-
-data class Playlist(val name: String, val tracks: List<Track>)
+data class Playlist(
+    val id: Long = 0,
+    val name: String,
+    val description: String?,
+    val coverPath: String?,
+    val amount: Int = 0
+)

@@ -5,9 +5,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker.R
 import com.example.playlistmaker.common.data.db.AppDatabase
 import com.example.playlistmaker.common.domain.models.Track
+import com.example.playlistmaker.library.domain.CreateResult
 import com.example.playlistmaker.library.domain.FavouriteTracksInteractor
+import com.example.playlistmaker.library.domain.PlaylistsInteractor
+import com.example.playlistmaker.library.domain.models.Playlist
+import com.example.playlistmaker.utils.Event
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -16,6 +21,7 @@ import kotlin.time.Duration.Companion.milliseconds
 class PlayerViewModel(
     track: Track,
     private val favouritesInteractor: FavouriteTracksInteractor,
+    private val playlistsInteractor: PlaylistsInteractor,
     private val db: AppDatabase,
 ) : ViewModel() {
     private val player = MediaPlayer()
@@ -27,6 +33,12 @@ class PlayerViewModel(
 
     private val playerStateLiveData = MutableLiveData<PlayerState>(PlayerState.Default)
     fun observePlayerState(): LiveData<PlayerState> = playerStateLiveData
+
+    private val playlistsLiveData = MutableLiveData<List<Playlist>>()
+    fun observePlaylists(): LiveData<List<Playlist>> = playlistsLiveData
+
+    private val message = MutableLiveData<Event<AddTrackToPlaylistResult>>()
+    fun observeMessage(): LiveData<Event<AddTrackToPlaylistResult>> = message
 
     init {
         preparePlayer(track.previewUrl)
@@ -60,6 +72,34 @@ class PlayerViewModel(
         }
     }
 
+    fun loadPlaylists() {
+        viewModelScope.launch {
+            playlistsInteractor.getPlaylists().collect { playlistsLiveData.postValue(it) }
+        }
+    }
+
+    fun onPlaylistClick(playlist: Playlist) {
+        val track = trackLiveData.value ?: return
+
+        viewModelScope.launch {
+            playlistsInteractor.addTrackToPlaylist(playlist.id, track).collect {
+                val result = when (it) {
+                    is CreateResult.AlreadyExists -> AddTrackToPlaylistResult.Error(
+                        R.string.track_already_in_playlist,
+                        playlist.name
+                    )
+
+                    is CreateResult.Success -> AddTrackToPlaylistResult.Success(
+                        R.string.add_track_to_playlist_success,
+                        playlist.name
+                    )
+                }
+
+                message.postValue(Event(result))
+            }
+        }
+    }
+
     private fun startPlayer() {
         player.start()
         playerStateLiveData.postValue(PlayerState.Playing(formatTime(player.currentPosition)))
@@ -72,7 +112,9 @@ class PlayerViewModel(
         playerStateLiveData.postValue(PlayerState.Paused(formatTime(player.currentPosition)))
     }
 
-    private fun preparePlayer(url: String) {
+    private fun preparePlayer(url: String?) {
+        if (url.isNullOrEmpty()) return
+
         player.setDataSource(url)
         player.prepareAsync()
         player.setOnPreparedListener {
@@ -121,4 +163,9 @@ sealed class PlayerState(val isPlayButtonEnabled: Boolean, val progressTime: Str
     object Prepared : PlayerState(true, Track.DEFAULT_TRACK_TIME)
     class Playing(progress: String) : PlayerState(true, progress)
     class Paused(progress: String) : PlayerState(true, progress)
+}
+
+sealed class AddTrackToPlaylistResult(val stringId: Int, val arg: String) {
+    class Success(r: Int, a: String) : AddTrackToPlaylistResult(r, a)
+    class Error(r: Int, a: String) : AddTrackToPlaylistResult(r, a)
 }

@@ -26,6 +26,7 @@ class FavouritesRepositoryImpl(
             .getTracks()
             .map { converter.map(it) }
             .sortedByDescending { it.isFavourite }
+        
         emit(tracks)
     }
 }

@@ -14,6 +14,8 @@ import com.example.playlistmaker.databinding.ActivityRootBinding
 class RootActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRootBinding
 
+    private val fragmentsWithoutBottomNav = listOf(R.id.playerFragment, R.id.createPlaylistFragment)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -30,7 +32,7 @@ class RootActivity : AppCompatActivity() {
         val navController = navHostFragment.navController
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            binding.bottomNav.isVisible = destination.id != R.id.playerFragment
+            binding.bottomNav.isVisible = !fragmentsWithoutBottomNav.contains(destination.id)
         }
 
         binding.bottomNav.setupWithNavController(navController)

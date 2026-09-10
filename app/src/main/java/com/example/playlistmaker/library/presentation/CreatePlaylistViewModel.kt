@@ -1,39 +1,35 @@
 package com.example.playlistmaker.library.presentation
 
-import android.app.Application
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Environment
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.playlistmaker.App
 import com.example.playlistmaker.R
-import com.example.playlistmaker.common.data.Constants
 import com.example.playlistmaker.library.domain.PlaylistsInteractor
 import com.example.playlistmaker.library.domain.models.Playlist
 import com.example.playlistmaker.utils.Event
+import com.example.playlistmaker.utils.getCoverImageFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
 import java.io.FileOutputStream
 
-class CreatePlaylistViewModel(
-    app: Application,
-    private val playlistsInteractor: PlaylistsInteractor
-) : AndroidViewModel(app) {
-    private val validityState = MutableLiveData(false)
+open class CreatePlaylistViewModel(
+    protected val playlistsInteractor: PlaylistsInteractor,
+) : ViewModel() {
+    protected val validityState = MutableLiveData(false)
     fun observeValidity(): LiveData<Boolean> = validityState
 
-    private val message = MutableLiveData<Event<String>>()
-    fun observeMessage(): LiveData<Event<String>> = message
+    private val message = MutableLiveData<Event<Int>>()
+    fun observeMessage(): LiveData<Event<Int>> = message
 
-    private var name = ""
-    private var description = ""
-    private var coverPath: Uri? = null
+    protected var name = ""
+    protected var description: String? = null
+    protected var coverUri: Uri? = null
 
     fun setName(s: CharSequence?) {
         name = if (s.isNullOrEmpty()) "" else s.toString()
@@ -41,33 +37,24 @@ class CreatePlaylistViewModel(
     }
 
     fun setDescription(s: CharSequence?) {
-        description = if (s.isNullOrEmpty()) "" else s.toString()
+        description = s?.toString()
     }
 
     fun setCoverPath(uri: Uri) {
-        coverPath = uri
+        coverUri = uri
     }
 
-    fun onCreateClick() {
+    fun onCreateClick(context: Context) {
         viewModelScope.launch {
-            val coverImageName = saveImageToPrivateStorage(coverPath, name)
-            playlistsInteractor.createPlaylist(
-                Playlist(
-                    name = name,
-                    description = description,
-                    coverPath = coverImageName,
-                )
-            ).collect {
-                message.postValue(
-                    Event(
-                        getApplication<App>()
-                            .getString(R.string.playlist_creation_success)
-                    )
-                )
-                name = ""
-                description = ""
-                coverPath = null
-                update()
+            withContext(Dispatchers.IO) {
+                val playlist = createModel(context)
+                playlistsInteractor.createPlaylist(playlist).collect {
+                    message.postValue(Event(R.string.playlist_creation_success))
+                    name = ""
+                    description = null
+                    coverUri = null
+                    update()
+                }
             }
         }
     }
@@ -76,33 +63,26 @@ class CreatePlaylistViewModel(
         validityState.postValue(name.isNotEmpty())
     }
 
-    private suspend fun saveImageToPrivateStorage(uri: Uri?, name: String): String? {
-        withContext(Dispatchers.IO) {
-            if (uri == null) return@withContext null
+    protected open suspend fun createModel(context: Context): Playlist {
+        val coverImageName = saveImageToPrivateStorage(context)
+        return Playlist(
+            name = name,
+            description = description,
+            coverPath = coverImageName,
+        )
+    }
 
-            //создаём экземпляр класса File, который указывает на нужный каталог
-            val filePath =
-                File(
-                    getApplication<App>().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-                    Constants.COVERS_DIR,
-                )
-            if (!filePath.exists()) {
-                filePath.mkdirs()
+    protected fun saveImageToPrivateStorage(context: Context): String? = coverUri?.let {
+        val file = getCoverImageFile(context, "${name.trim()}.jpg")!!
+
+        context.contentResolver.openInputStream(it).use { input ->
+            FileOutputStream(file).use { output ->
+                val decodedStream =
+                    BitmapFactory.decodeStream(input) ?: return null
+                decodedStream.compress(Bitmap.CompressFormat.JPEG, 30, output)
             }
-            val file = File(filePath, "${name.trim()}.jpg")
-
-            getApplication<App>().contentResolver.openInputStream(uri).use { input ->
-                FileOutputStream(file).use { output ->
-                    val decodedStream =
-                        BitmapFactory.decodeStream(input) ?: return@withContext null
-                    decodedStream.compress(Bitmap.CompressFormat.JPEG, 30, output)
-
-                }
-            }
-
-            return@withContext file.name
         }
 
-        return null
+        return file.name
     }
 }

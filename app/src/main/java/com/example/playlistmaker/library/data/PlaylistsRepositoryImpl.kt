@@ -35,4 +35,20 @@ class PlaylistsRepositoryImpl(
             else -> emit(DbResult.Success(id))
         }
     }
+
+    override fun getPlaylistById(playlistId: Long): Flow<Pair<Playlist, List<Track>>> = flow {
+        val data = db.playlistsDao().getPlaylistById(playlistId)
+        val playlist = converter.map(data.playlist)
+        val tracks = data.tracks.map { converter.map(it) }
+
+        emit(Pair(playlist, tracks))
+    }
+
+    override suspend fun removeTrackFromPlaylist(trackId: Long, playlistId: Long) =
+        db.playlistsDao().deleteTrackFromPlaylist(trackId, playlistId)
+
+    override suspend fun removePlaylist(playlist: Playlist) {
+        val entity = converter.map(playlist)
+        db.playlistsDao().deletePlaylist(entity)
+    }
 }

@@ -12,15 +12,15 @@ import com.example.playlistmaker.databinding.FragmentPlaylistsBinding
 import com.example.playlistmaker.library.domain.models.Playlist
 import com.example.playlistmaker.library.presentation.PlaylistsState
 import com.example.playlistmaker.library.presentation.PlaylistsViewModel
-import com.example.playlistmaker.utils.BindingFragment
-import com.example.playlistmaker.utils.GridSpacingItemDecoration
-import com.example.playlistmaker.utils.dp
+import com.example.playlistmaker.utils.ui.BindingFragment
+import com.example.playlistmaker.utils.ui.GridSpacingItemDecoration
+import com.example.playlistmaker.utils.ui.dp
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class PlaylistsFragment : BindingFragment<FragmentPlaylistsBinding>() {
     private val viewModel: PlaylistsViewModel by activityViewModel()
 
-    private val playlistsAdapter = PlaylistsAdapter()
+    private val playlistsAdapter = PlaylistsAdapter { openPlaylist(it.id) }
 
     override fun createBinding(
         inflater: LayoutInflater,
@@ -63,4 +63,10 @@ class PlaylistsFragment : BindingFragment<FragmentPlaylistsBinding>() {
         playlistsAdapter.playlists = playlists
         playlistsAdapter.notifyDataSetChanged()
     }
+
+    private fun openPlaylist(playlistId: Long) =
+        findNavController().navigate(
+            R.id.action_libraryFragment_to_playlistFragment,
+            PlaylistFragment.createArgs(playlistId)
+        )
 }

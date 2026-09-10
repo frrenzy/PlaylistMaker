@@ -11,9 +11,10 @@ import com.example.playlistmaker.library.domain.PlaylistsRepository
 import com.example.playlistmaker.library.domain.impl.FavouriteTracksInteractorImpl
 import com.example.playlistmaker.library.domain.impl.PlaylistsInteractorImpl
 import com.example.playlistmaker.library.presentation.CreatePlaylistViewModel
+import com.example.playlistmaker.library.presentation.EditPlaylistViewModel
 import com.example.playlistmaker.library.presentation.FavouritesViewModel
+import com.example.playlistmaker.library.presentation.PlaylistViewModel
 import com.example.playlistmaker.library.presentation.PlaylistsViewModel
-import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -51,6 +52,14 @@ val libraryModule = module {
     }
 
     viewModel {
-        CreatePlaylistViewModel(androidApplication(), get())
+        CreatePlaylistViewModel(get())
+    }
+
+    viewModel { (playlistId: Long) ->
+        PlaylistViewModel(playlistId, get(), get())
+    }
+
+    viewModel { (playlistId: Long) ->
+        EditPlaylistViewModel(playlistId, get())
     }
 }

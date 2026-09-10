@@ -14,7 +14,7 @@ import com.example.playlistmaker.databinding.FragmentFavouritesBinding
 import com.example.playlistmaker.library.presentation.FavouritesState
 import com.example.playlistmaker.library.presentation.FavouritesViewModel
 import com.example.playlistmaker.player.ui.PlayerFragment
-import com.example.playlistmaker.utils.BindingFragment
+import com.example.playlistmaker.utils.ui.BindingFragment
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class FavouritesFragment : BindingFragment<FragmentFavouritesBinding>() {

@@ -23,4 +23,12 @@ class PlaylistsInteractorImpl(
                 is DbResult.Success -> CreateResult.Success(it.id)
             }
         }
+
+    override fun getPlaylistById(playlistId: Long): Flow<Pair<Playlist, List<Track>>> =
+        repository.getPlaylistById(playlistId)
+
+    override suspend fun removeTrackFromPlaylist(trackId: Long, playlistId: Long) =
+        repository.removeTrackFromPlaylist(trackId, playlistId)
+
+    override suspend fun removePlaylist(playlist: Playlist) = repository.removePlaylist(playlist)
 }

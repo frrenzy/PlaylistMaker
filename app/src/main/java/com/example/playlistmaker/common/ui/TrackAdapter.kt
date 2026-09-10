@@ -4,7 +4,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.common.domain.models.Track
 
-class TrackAdapter(val onClickListener: TrackClickListener? = null) :
+class TrackAdapter(
+    val onLongClickListener: TrackLongClickListener? = null,
+    val onClickListener: TrackClickListener? = null,
+) :
     RecyclerView.Adapter<TrackViewHolder>() {
     var tracks: List<Track> = emptyList()
 
@@ -12,13 +15,24 @@ class TrackAdapter(val onClickListener: TrackClickListener? = null) :
         TrackViewHolder.from(parent)
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
-        holder.bind(tracks[position])
-        holder.itemView.setOnClickListener { onClickListener?.onClick(tracks[position]) }
+        val track = tracks[position]
+        holder.bind(track)
+        holder.itemView.apply {
+            setOnClickListener { onClickListener?.onClick(track) }
+            setOnLongClickListener {
+                onLongClickListener?.onClick(track)
+                true
+            }
+        }
     }
 
     override fun getItemCount() = tracks.size
 
     fun interface TrackClickListener {
+        fun onClick(track: Track)
+    }
+
+    fun interface TrackLongClickListener {
         fun onClick(track: Track)
     }
 }

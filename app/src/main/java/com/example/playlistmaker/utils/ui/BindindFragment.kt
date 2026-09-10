@@ -1,4 +1,4 @@
-package com.example.playlistmaker.utils
+package com.example.playlistmaker.utils.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -18,7 +18,7 @@ abstract class BindingFragment<T : ViewBinding> : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = createBinding(inflater, container)
-        
+
         return binding.root
     }
 }

@@ -30,10 +30,10 @@ class ExternalNavigatorImpl(private val context: Context) : ExternalNavigator {
         context.startActivity(viewIntent)
     }
 
-    override fun shareLink(link: String) {
+    override fun shareText(text: String) {
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             setType("text/plain")
-            putExtra(Intent.EXTRA_TEXT, link)
+            putExtra(Intent.EXTRA_TEXT, text)
             setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
 

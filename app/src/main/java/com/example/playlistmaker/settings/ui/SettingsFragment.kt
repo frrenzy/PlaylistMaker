@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.playlistmaker.databinding.FragmentSettingsBinding
 import com.example.playlistmaker.settings.presentation.SettingsViewModel
-import com.example.playlistmaker.utils.BindingFragment
+import com.example.playlistmaker.utils.ui.BindingFragment
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class SettingsFragment : BindingFragment<FragmentSettingsBinding>() {

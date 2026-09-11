@@ -8,11 +8,12 @@ import androidx.room.Upsert
 import com.example.playlistmaker.library.data.db.entities.PlaylistEntity
 import com.example.playlistmaker.library.data.db.entities.PlaylistTrackCrossRefEntity
 import com.example.playlistmaker.library.data.db.entities.TrackEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class PlaylistsDao {
     @Query("SELECT * FROM playlists")
-    abstract suspend fun getPlaylists(): List<PlaylistEntity>
+    abstract fun getPlaylists(): Flow<List<PlaylistEntity>>
 
     @Transaction
     @Query(
@@ -22,10 +23,10 @@ abstract class PlaylistsDao {
         WHERE playlistId = :id
         """
     )
-    abstract suspend fun getPlaylistById(id: Long): PlaylistWithTracks
+    abstract fun getPlaylistById(id: Long): Flow<PlaylistWithTracks>
 
     @Upsert
-    abstract suspend fun createPlaylist(playlistEntity: PlaylistEntity): Long
+    abstract fun createPlaylist(playlistEntity: PlaylistEntity): Long
 
     @Upsert
     internal abstract suspend fun createTrack(track: TrackEntity): Long

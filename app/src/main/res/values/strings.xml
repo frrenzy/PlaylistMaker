@@ -53,6 +53,8 @@
         <item quantity="few">%d минуты</item>
         <item quantity="many">%d минут</item>
     </plurals>
+    <string name="playlist_no_tracks_to_share">В данном плейлисте нет списка треков, которым можно поделиться</string>
+    <string name="playlist_no_tracks">В данном плейлисте ещё нет треков :(</string>
     <string name="playlist_delete_track_dialog_question">Хотите удалить трек?</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>

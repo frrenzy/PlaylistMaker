@@ -1,13 +1,11 @@
 package com.example.playlistmaker.library.presentation
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.library.domain.PlaylistsInteractor
 import com.example.playlistmaker.library.domain.models.Playlist
 import com.example.playlistmaker.utils.Event
-import com.example.playlistmaker.utils.getCoverImageFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -38,16 +36,13 @@ class EditPlaylistViewModel(
         }
     }
 
-    override suspend fun createModel(context: Context): Playlist {
+    override suspend fun createModel(): Playlist {
         val coverImage = coverUri?.let { // if new file was picked
             originalFileName?.let { fileName ->
-                getCoverImageFile(
-                    context,
-                    fileName
-                )?.delete() // delete old file by its name
+                playlistsInteractor.deleteCoverImage(fileName) // delete old file by its name
             }
 
-            saveImageToPrivateStorage(context) // save new file
+            saveImageToPrivateStorage() // save new file
         } ?: originalFileName // else keep old
 
         return Playlist(

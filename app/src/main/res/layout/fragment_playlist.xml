@@ -134,6 +134,19 @@
                 android:src="@drawable/ic_menu_24"
                 app:layout_constraintBottom_toBottomOf="@id/share_button"
                 app:layout_constraintStart_toEndOf="@id/share_button" />
+
+            <TextView
+                android:id="@+id/empty_message"
+                style="@style/PlaylistPage.Info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_large"
+                android:text="@string/playlist_no_tracks"
+                android:visibility="gone"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintEnd_toStartOf="@id/right_border"
+                app:layout_constraintStart_toEndOf="@id/left_border"
+                app:layout_constraintTop_toBottomOf="@id/share_button" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 

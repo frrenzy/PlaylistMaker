@@ -1,7 +1,6 @@
 package com.example.playlistmaker.library.ui
 
 import android.os.Bundle
-import android.view.View
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.doOnTextChanged
@@ -21,10 +20,6 @@ class EditPlaylistFragment : CreatePlaylistFragment() {
     override val viewModel: EditPlaylistViewModel by viewModel {
         val playlistId = requireArguments().getLong(PLAYLIST_KEY)
         parametersOf(playlistId)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
     }
 
     override fun setupListeners() {
@@ -56,7 +51,7 @@ class EditPlaylistFragment : CreatePlaylistFragment() {
 
             backButton.setOnClickListener { findNavController().navigateUp() }
 
-            createButton.setOnClickListener { viewModel.onCreateClick(requireActivity()) }
+            createButton.setOnClickListener { viewModel.onCreateClick() }
             name.editText?.doOnTextChanged { s, _, _, _ -> viewModel.setName(s) }
             description.editText?.doOnTextChanged { s, _, _, _ -> viewModel.setDescription(s) }
         }

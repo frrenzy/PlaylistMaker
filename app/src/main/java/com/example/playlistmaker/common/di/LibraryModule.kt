@@ -15,6 +15,7 @@ import com.example.playlistmaker.library.presentation.EditPlaylistViewModel
 import com.example.playlistmaker.library.presentation.FavouritesViewModel
 import com.example.playlistmaker.library.presentation.PlaylistViewModel
 import com.example.playlistmaker.library.presentation.PlaylistsViewModel
+import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -36,7 +37,7 @@ val libraryModule = module {
     }
 
     single<PlaylistsRepository> {
-        PlaylistsRepositoryImpl(get(), get())
+        PlaylistsRepositoryImpl(get(), get(), androidContext())
     }
 
     single<PlaylistsInteractor> {

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.findNavController
@@ -28,6 +29,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
+import java.util.concurrent.TimeUnit
 
 class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
     private val viewModel: PlaylistViewModel by viewModel {
@@ -78,7 +80,7 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
 
         confirmPlaylistDeletionDialog = MaterialAlertDialogBuilder(requireActivity())
             .setPositiveButton(getString(R.string.yes)) { _, _ ->
-                viewModel.deletePlaylist(requireActivity())
+                viewModel.deletePlaylist()
                 findNavController().navigateUp()
             }
             .setNegativeButton(getString(R.string.no)) { dialog, _ -> dialog.dismiss() }
@@ -88,11 +90,8 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
 
             backButton.setOnClickListener { findNavController().navigateUp() }
 
-            shareButton.setOnClickListener { viewModel.sharePlaylist() }
-
-            menuButton.setOnClickListener {
-                menuBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            }
+            shareButton.setOnClickListener { sharePlaylist() }
+            menuButton.setOnClickListener { showMenu() }
 
             menuBottomSheetBehavior.addBottomSheetCallback(object :
                 BottomSheetBehavior.BottomSheetCallback() {
@@ -109,11 +108,10 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
             })
 
             overlay.setOnClickListener {
-                menuBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                overlay.isVisible = false
+                hideMenu()
             }
 
-            menuShare.setOnClickListener { viewModel.shareApp() }
+            menuShare.setOnClickListener { sharePlaylist() }
             menuDelete.setOnClickListener {
                 confirmPlaylistDeletionDialog
                     .setTitle(
@@ -154,12 +152,8 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
             description.isVisible = false
         }
 
-        val playTime = tracks.fold(0) { acc, track -> acc + track.trackTimeMillis }
-        val playTimeInMinutes =
-            Track.trackTimeFormat
-                .format(playTime)
-                .substringBefore(':')
-                .toInt()
+        val playTime = tracks.fold(0L) { acc, track -> acc + track.trackTimeMillis }
+        val playTimeInMinutes = TimeUnit.MILLISECONDS.toMinutes(playTime).toInt()
         length.text = resources.getQuantityString(
             R.plurals.playlist_length,
             playTimeInMinutes, playTimeInMinutes,
@@ -169,6 +163,9 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
                 R.plurals.playlist_track_amount,
                 tracks.size, tracks.size,
             )
+        if (tracks.isEmpty()) {
+            emptyMessage.isVisible = true
+        }
 
         /* Menu card */
         preparedImage
@@ -189,8 +186,30 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
             tracksBottomSheet.isVisible = false
             mainContent.setPadding(0, 0, 0, 0)
         }
-        trackAdapter.tracks = tracks
+        trackAdapter.tracks = tracks.reversed()
         trackAdapter.notifyDataSetChanged()
+    }
+
+    private fun sharePlaylist() {
+        hideMenu()
+
+        if (trackAdapter.tracks.isEmpty()) {
+            Toast.makeText(
+                requireActivity(),
+                R.string.playlist_no_tracks_to_share,
+                Toast.LENGTH_LONG
+            ).show()
+        } else {
+            viewModel.sharePlaylist()
+        }
+    }
+
+    private fun showMenu() {
+        menuBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+
+    private fun hideMenu() {
+        menuBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
     private fun openPlayer(track: Track) {

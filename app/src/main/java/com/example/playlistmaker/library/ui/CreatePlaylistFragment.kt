@@ -79,7 +79,7 @@ open class CreatePlaylistFragment : BindingFragment<FragmentCreatePlaylistBindin
 
             description.editText?.doOnTextChanged { s, _, _, _ -> viewModel.setDescription(s) }
 
-            createButton.setOnClickListener { viewModel.onCreateClick(requireActivity()) }
+            createButton.setOnClickListener { viewModel.onCreateClick() }
 
             playlistCover.setOnClickListener {
                 pickMedia.launch(

@@ -1,6 +1,5 @@
 package com.example.playlistmaker.library.presentation
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,7 +8,6 @@ import com.example.playlistmaker.common.domain.models.Track
 import com.example.playlistmaker.library.domain.PlaylistsInteractor
 import com.example.playlistmaker.library.domain.models.Playlist
 import com.example.playlistmaker.sharing.domain.SharingInteractor
-import com.example.playlistmaker.utils.getCoverImageFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -44,18 +42,16 @@ class PlaylistViewModel(
     fun sharePlaylist() {
         val playlist = playlistLiveData.value?.first ?: return
         val tracks = playlistLiveData.value?.second ?: return
+        if (tracks.isEmpty()) return
 
         sharingInteractor.sharePlaylist(playlist, tracks)
     }
 
-    fun shareApp() = sharingInteractor.shareApp()
-
-    fun deletePlaylist(context: Context) {
+    fun deletePlaylist() {
         val playlist = playlistLiveData.value?.first ?: return
 
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                getCoverImageFile(context, playlist.coverPath)?.delete()
                 playlistsInteractor.removePlaylist(playlist)
             }
         }

@@ -1,5 +1,6 @@
 package com.example.playlistmaker.library.domain
 
+import android.net.Uri
 import com.example.playlistmaker.common.domain.models.Track
 import com.example.playlistmaker.library.domain.models.Playlist
 import kotlinx.coroutines.flow.Flow
@@ -11,6 +12,8 @@ interface PlaylistsInteractor {
     fun getPlaylistById(playlistId: Long): Flow<Pair<Playlist, List<Track>>>
     suspend fun removeTrackFromPlaylist(trackId: Long, playlistId: Long)
     suspend fun removePlaylist(playlist: Playlist)
+    fun saveCoverImage(uri: Uri, name: String): String?
+    fun deleteCoverImage(name: String)
 }
 
 sealed interface CreateResult {

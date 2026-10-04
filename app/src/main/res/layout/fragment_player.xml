@@ -106,17 +106,18 @@
                 app:layout_constraintTag="addTag"
                 app:layout_constraintTop_toBottomOf="@id/track_author" />
 
-            <ImageButton
+            <com.example.playlistmaker.player.ui.PlaybackButtonView
                 android:id="@+id/play_button"
                 android:layout_width="83dp"
                 android:layout_height="83dp"
                 android:layout_marginTop="38dp"
-                android:background="@drawable/play_button"
                 app:layout_constraintEnd_toStartOf="@id/like_button"
                 app:layout_constraintHorizontal_chainStyle="spread_inside"
                 app:layout_constraintStart_toEndOf="@id/add_button"
                 app:layout_constraintTag="playTag"
-                app:layout_constraintTop_toBottomOf="@id/track_author" />
+                app:layout_constraintTop_toBottomOf="@id/track_author"
+                app:pausedStateResId="@drawable/play_button"
+                app:playingStateResId="@drawable/pause_button" />
 
             <ImageButton
                 android:id="@+id/like_button"

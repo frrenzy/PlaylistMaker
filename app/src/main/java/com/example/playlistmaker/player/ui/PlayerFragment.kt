@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.findNavController
@@ -183,15 +182,8 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
     private fun renderPlayer(state: PlayerState) {
         binding.apply {
             playButton.isEnabled = state.isPlayButtonEnabled
+            playButton.state = state
             playTime.text = state.progressTime
-            playButton.background = when (state) {
-                is PlayerState.Playing -> getDrawable(
-                    requireActivity(),
-                    R.drawable.pause_button
-                )
-
-                else -> getDrawable(requireActivity(), R.drawable.play_button)
-            }
         }
     }
 

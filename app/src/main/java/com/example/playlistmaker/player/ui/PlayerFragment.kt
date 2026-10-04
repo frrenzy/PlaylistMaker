@@ -182,8 +182,10 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
     private fun renderPlayer(state: PlayerState) {
         binding.apply {
             playButton.isEnabled = state.isPlayButtonEnabled
-            playButton.state = state
             playTime.text = state.progressTime
+            if (state is PlayerState.Prepared) {
+                playButton.prepare()
+            }
         }
     }
 

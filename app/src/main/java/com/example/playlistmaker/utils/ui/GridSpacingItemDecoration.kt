@@ -1,9 +1,8 @@
-package com.example.playlistmaker.utils
+package com.example.playlistmaker.utils.ui
 
 import android.graphics.Rect
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
-
 
 class GridSpacingItemDecoration(
     private val spanCount: Int,

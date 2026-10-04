@@ -8,6 +8,7 @@ import com.example.playlistmaker.library.domain.models.Playlist
 class PlaylistDbConverter {
     fun map(playlist: Playlist): PlaylistEntity = with(playlist) {
         PlaylistEntity(
+            playlistId = id,
             name = name,
             description = description,
             coverPath = coverPath,
@@ -54,7 +55,7 @@ class PlaylistDbConverter {
             primaryGenreName = primaryGenreName,
             previewUrl = previewUrl,
             releaseDate = releaseDate,
-            isFavourite = true,
+            isFavourite = true, // На экране плеера происходит перезапись поля
         )
     }
 }

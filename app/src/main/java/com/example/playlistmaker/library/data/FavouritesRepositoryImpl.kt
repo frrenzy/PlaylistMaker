@@ -5,7 +5,7 @@ import com.example.playlistmaker.common.domain.models.Track
 import com.example.playlistmaker.library.data.converters.TrackDbConverter
 import com.example.playlistmaker.library.domain.FavouritesRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 
 class FavouritesRepositoryImpl(
     private val db: AppDatabase,
@@ -21,12 +21,13 @@ class FavouritesRepositoryImpl(
         db.favouriteTracksDao().removeTrack(entity)
     }
 
-    override fun getTracks(): Flow<List<Track>> = flow {
-        val tracks = db.favouriteTracksDao()
-            .getTracks()
-            .map { converter.map(it) }
-            .sortedByDescending { it.isFavourite }
-        
-        emit(tracks)
-    }
+    override fun getTrackIds(): Flow<List<Long>> = db.favouriteTracksDao().getTrackIds()
+
+    override fun getTracks(): Flow<List<Track>> = db.favouriteTracksDao()
+        .getTracks()
+        .map { tracks ->
+            tracks
+                .map { converter.map(it) }
+                .sortedByDescending { it.isFavourite }
+        }
 }

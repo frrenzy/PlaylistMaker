@@ -19,7 +19,7 @@ import com.example.playlistmaker.history.presentation.HistoryViewModel
 import com.example.playlistmaker.player.ui.PlayerFragment
 import com.example.playlistmaker.search.presentation.SearchState
 import com.example.playlistmaker.search.presentation.SearchViewModel
-import com.example.playlistmaker.utils.BindingFragment
+import com.example.playlistmaker.utils.ui.BindingFragment
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class SearchFragment : BindingFragment<FragmentSearchBinding>() {

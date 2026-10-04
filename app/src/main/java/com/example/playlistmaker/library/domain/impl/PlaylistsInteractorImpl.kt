@@ -1,5 +1,6 @@
 package com.example.playlistmaker.library.domain.impl
 
+import android.net.Uri
 import com.example.playlistmaker.common.domain.models.Track
 import com.example.playlistmaker.library.domain.CreateResult
 import com.example.playlistmaker.library.domain.PlaylistsInteractor
@@ -23,4 +24,20 @@ class PlaylistsInteractorImpl(
                 is DbResult.Success -> CreateResult.Success(it.id)
             }
         }
+
+    override fun getPlaylistById(playlistId: Long): Flow<Pair<Playlist, List<Track>>> =
+        repository.getPlaylistById(playlistId)
+
+    override suspend fun removeTrackFromPlaylist(trackId: Long, playlistId: Long) =
+        repository.removeTrackFromPlaylist(trackId, playlistId)
+
+    override suspend fun removePlaylist(playlist: Playlist) {
+        deleteCoverImage(playlist.name)
+        repository.removePlaylist(playlist)
+    }
+
+    override fun saveCoverImage(uri: Uri, name: String) =
+        repository.saveCoverImage(uri, "${name.trim()}.jpg")
+
+    override fun deleteCoverImage(name: String) = repository.deleteCoverImage(name)
 }

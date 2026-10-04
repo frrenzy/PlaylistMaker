@@ -16,14 +16,14 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.common.data.Constants
 import com.example.playlistmaker.databinding.FragmentCreatePlaylistBinding
 import com.example.playlistmaker.library.presentation.CreatePlaylistViewModel
-import com.example.playlistmaker.utils.BindingFragment
+import com.example.playlistmaker.utils.ui.BindingFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class CreatePlaylistFragment : BindingFragment<FragmentCreatePlaylistBinding>() {
-    private val viewModel: CreatePlaylistViewModel by activityViewModel()
+open class CreatePlaylistFragment : BindingFragment<FragmentCreatePlaylistBinding>() {
+    protected open val viewModel: CreatePlaylistViewModel by viewModel()
 
-    private val pickMedia =
+    protected val pickMedia =
         registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
             if (uri != null) {
                 viewModel.setCoverPath(uri)
@@ -42,6 +42,10 @@ class CreatePlaylistFragment : BindingFragment<FragmentCreatePlaylistBinding>() 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupListeners()
+    }
+
+    protected open fun setupListeners() {
         viewModel.observeValidity().observe(viewLifecycleOwner) {
             binding.createButton.isEnabled = it
         }

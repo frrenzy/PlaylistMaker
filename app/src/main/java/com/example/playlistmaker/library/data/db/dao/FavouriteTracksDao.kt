@@ -6,14 +6,15 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.playlistmaker.library.data.db.entities.FavouriteTrackEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FavouriteTracksDao {
     @Query("SELECT * FROM favourite_tracks")
-    suspend fun getTracks(): List<FavouriteTrackEntity>
+    fun getTracks(): Flow<List<FavouriteTrackEntity>>
 
     @Query("SELECT id FROM favourite_tracks")
-    suspend fun getTrackIds(): List<Long>
+    fun getTrackIds(): Flow<List<Long>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addTrack(track: FavouriteTrackEntity)

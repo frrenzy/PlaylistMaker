@@ -20,8 +20,9 @@ import com.example.playlistmaker.databinding.FragmentPlayerBinding
 import com.example.playlistmaker.player.presentation.AddTrackToPlaylistResult
 import com.example.playlistmaker.player.presentation.PlayerState
 import com.example.playlistmaker.player.presentation.PlayerViewModel
-import com.example.playlistmaker.utils.BindingFragment
-import com.example.playlistmaker.utils.dp
+import com.example.playlistmaker.utils.ui.BindingFragment
+import com.example.playlistmaker.utils.ui.dp
+import com.example.playlistmaker.utils.ui.slideToOverlayAlpha
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -53,33 +54,35 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
             state = BottomSheetBehavior.STATE_HIDDEN
         }
 
-        viewModel.observeTrack().observe(viewLifecycleOwner) {
-            drawTrack(it)
-        }
+        with(viewModel) {
+            observeTrack().observe(viewLifecycleOwner) {
+                drawTrack(it)
+            }
+            loadTrack()
 
-        viewModel.observePlayerState().observe(viewLifecycleOwner) {
-            renderPlayer(it)
-        }
+            observePlayerState().observe(viewLifecycleOwner) {
+                renderPlayer(it)
+            }
 
-        viewModel.observePlaylists().observe(viewLifecycleOwner) {
-            playlistsAdapter.playlists = it
-            playlistsAdapter.notifyDataSetChanged()
-        }
-        viewModel.loadPlaylists()
+            observePlaylists().observe(viewLifecycleOwner) {
+                playlistsAdapter.playlists = it
+                playlistsAdapter.notifyDataSetChanged()
+            }
+            loadPlaylists()
 
-        viewModel.observeMessage().observe(viewLifecycleOwner) { message ->
-            message.getContentIfNotHandled()?.let {
-                if (it is AddTrackToPlaylistResult.Success) {
-                    binding.overlay.isVisible = false
-                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                    viewModel.loadPlaylists()
+            observeMessage().observe(viewLifecycleOwner) { message ->
+                message.getContentIfNotHandled()?.let {
+                    if (it is AddTrackToPlaylistResult.Success) {
+                        binding.overlay.isVisible = false
+                        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                    }
+
+                    Toast.makeText(
+                        requireActivity(),
+                        requireActivity().getString(it.stringId, it.arg),
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
-
-                Toast.makeText(
-                    requireActivity(),
-                    requireActivity().getString(it.stringId, it.arg),
-                    Toast.LENGTH_LONG
-                ).show()
             }
         }
 
@@ -116,6 +119,10 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
                     overlay.alpha = slideToOverlayAlpha(slideOffset)
                 }
             })
+            overlay.setOnClickListener {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                overlay.isVisible = false
+            }
 
             addButton.setOnClickListener {
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
@@ -187,8 +194,6 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
             }
         }
     }
-
-    private fun slideToOverlayAlpha(slide: Float) = (slide + 1f) / 2
 
     companion object {
         private const val TRACK_ART_CORNER_RADIUS = 8

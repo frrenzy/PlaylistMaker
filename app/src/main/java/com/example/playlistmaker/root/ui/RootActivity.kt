@@ -14,7 +14,13 @@ import com.example.playlistmaker.databinding.ActivityRootBinding
 class RootActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRootBinding
 
-    private val fragmentsWithoutBottomNav = listOf(R.id.playerFragment, R.id.createPlaylistFragment)
+    private val fragmentsWithoutBottomNav =
+        listOf(
+            R.id.playerFragment,
+            R.id.createPlaylistFragment,
+            R.id.playlistFragment,
+            R.id.editPlaylistFragment,
+        )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

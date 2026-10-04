@@ -6,23 +6,23 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.R
-import com.example.playlistmaker.common.data.db.AppDatabase
 import com.example.playlistmaker.common.domain.models.Track
 import com.example.playlistmaker.library.domain.CreateResult
 import com.example.playlistmaker.library.domain.FavouriteTracksInteractor
 import com.example.playlistmaker.library.domain.PlaylistsInteractor
 import com.example.playlistmaker.library.domain.models.Playlist
 import com.example.playlistmaker.utils.Event
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.time.Duration.Companion.milliseconds
 
 class PlayerViewModel(
-    track: Track,
+    private val track: Track,
     private val favouritesInteractor: FavouriteTracksInteractor,
     private val playlistsInteractor: PlaylistsInteractor,
-    private val db: AppDatabase,
 ) : ViewModel() {
     private val player = MediaPlayer()
 
@@ -42,11 +42,16 @@ class PlayerViewModel(
 
     init {
         preparePlayer(track.previewUrl)
-        viewModelScope.launch {
-            val favouriteTrackIds = db.favouriteTracksDao().getTrackIds()
-            val isTrackInFavourite = favouriteTrackIds.contains(track.trackId)
+    }
 
-            trackLiveData.postValue(track.copy(isFavourite = isTrackInFavourite))
+    fun loadTrack() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                favouritesInteractor.getTrackIds().collect {
+                    val isTrackInFavourite = it.contains(track.trackId)
+                    trackLiveData.postValue(track.copy(isFavourite = isTrackInFavourite))
+                }
+            }
         }
     }
 
@@ -62,12 +67,14 @@ class PlayerViewModel(
         val track = trackLiveData.value ?: return
 
         viewModelScope.launch {
-            if (track.isFavourite) {
-                favouritesInteractor.removeTrack(track)
-                trackLiveData.postValue(track.copy(isFavourite = false))
-            } else {
-                favouritesInteractor.addTrack(track)
-                trackLiveData.postValue(track.copy(isFavourite = true))
+            withContext(Dispatchers.IO) {
+                if (track.isFavourite) {
+                    favouritesInteractor.removeTrack(track)
+                    trackLiveData.postValue(track.copy(isFavourite = false))
+                } else {
+                    favouritesInteractor.addTrack(track)
+                    trackLiveData.postValue(track.copy(isFavourite = true))
+                }
             }
         }
     }

@@ -1,12 +1,18 @@
 package com.example.playlistmaker.player.ui
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.ComponentName
+import android.content.Context
+import android.content.ServiceConnection
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.findNavController
@@ -19,6 +25,7 @@ import com.example.playlistmaker.databinding.FragmentPlayerBinding
 import com.example.playlistmaker.player.presentation.AddTrackToPlaylistResult
 import com.example.playlistmaker.player.presentation.PlayerState
 import com.example.playlistmaker.player.presentation.PlayerViewModel
+import com.example.playlistmaker.player.services.MusicService
 import com.example.playlistmaker.utils.ui.BindingFragment
 import com.example.playlistmaker.utils.ui.dp
 import com.example.playlistmaker.utils.ui.slideToOverlayAlpha
@@ -28,12 +35,31 @@ import org.koin.core.parameter.parametersOf
 
 class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
     private val viewModel: PlayerViewModel by viewModel {
-        val track = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            requireArguments().getParcelable(PLAYER_TRACK_KEY, Track::class.java)
-        } else {
-            requireArguments().getParcelable(PLAYER_TRACK_KEY)
-        }
+        val track = getTrackFromArgs()
         parametersOf(track)
+    }
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as MusicService.MusicServiceBinder
+
+            viewModel.setMusicPlayerControl(binder.getService())
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            viewModel.removeAudioPlayerControl()
+        }
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            bindMusicService()
+        } else {
+            Toast.makeText(requireContext(), "Can't start foreground service!", Toast.LENGTH_LONG)
+                .show()
+        }
     }
 
     private val playlistsAdapter = PlaylistsSmallAdapter {
@@ -51,6 +77,12 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
 
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet).apply {
             state = BottomSheetBehavior.STATE_HIDDEN
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            bindMusicService()
         }
 
         with(viewModel) {
@@ -140,11 +172,6 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        viewModel.onPaused()
-    }
-
     private fun drawTrack(track: Track) {
         binding.apply {
             trackName.text = track.trackName
@@ -179,6 +206,29 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        unbindMusicService()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.onFragmentPaused()
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.onFragmentResumed()
+    }
+
+    private fun getTrackFromArgs() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        requireArguments().getParcelable(PLAYER_TRACK_KEY, Track::class.java)
+    } else {
+        requireArguments().getParcelable(PLAYER_TRACK_KEY)
+    }
+
     private fun renderPlayer(state: PlayerState) {
         binding.apply {
             playButton.isEnabled = state.isPlayButtonEnabled
@@ -187,6 +237,17 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
                 playButton.prepare()
             }
         }
+    }
+
+    private fun bindMusicService() {
+        with(requireContext()) {
+            val intent = MusicService.createIntent(this, getTrackFromArgs())
+            bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+        }
+    }
+
+    private fun unbindMusicService() {
+        requireContext().unbindService(serviceConnection)
     }
 
     companion object {

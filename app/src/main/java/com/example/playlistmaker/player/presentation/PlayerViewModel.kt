@@ -1,6 +1,5 @@
 package com.example.playlistmaker.player.presentation
 
-import android.media.MediaPlayer
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,22 +10,19 @@ import com.example.playlistmaker.library.domain.CreateResult
 import com.example.playlistmaker.library.domain.FavouriteTracksInteractor
 import com.example.playlistmaker.library.domain.PlaylistsInteractor
 import com.example.playlistmaker.library.domain.models.Playlist
+import com.example.playlistmaker.player.services.MusicPlayerControl
+import com.example.playlistmaker.player.services.MusicPlayerState
 import com.example.playlistmaker.utils.Event
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.time.Duration.Companion.milliseconds
 
 class PlayerViewModel(
     private val track: Track,
     private val favouritesInteractor: FavouriteTracksInteractor,
     private val playlistsInteractor: PlaylistsInteractor,
 ) : ViewModel() {
-    private val player = MediaPlayer()
-
-    private var updateTimer: Job? = null
+    private var musicPlayerControl: MusicPlayerControl? = null
 
     private val trackLiveData = MutableLiveData<Track>()
     fun observeTrack(): LiveData<Track> = trackLiveData
@@ -40,10 +36,6 @@ class PlayerViewModel(
     private val message = MutableLiveData<Event<AddTrackToPlaylistResult>>()
     fun observeMessage(): LiveData<Event<AddTrackToPlaylistResult>> = message
 
-    init {
-        preparePlayer(track.previewUrl)
-    }
-
     fun loadTrack() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
@@ -53,6 +45,20 @@ class PlayerViewModel(
                 }
             }
         }
+    }
+
+    fun setMusicPlayerControl(control: MusicPlayerControl) {
+        musicPlayerControl = control
+
+        viewModelScope.launch {
+            musicPlayerControl?.getPlayerState()?.collect {
+                playerStateLiveData.postValue(mapState(it))
+            }
+        }
+    }
+
+    fun removeAudioPlayerControl() {
+        musicPlayerControl = null
     }
 
     fun onPlayButtonClick() {
@@ -108,61 +114,33 @@ class PlayerViewModel(
     }
 
     private fun startPlayer() {
-        player.start()
-        playerStateLiveData.postValue(PlayerState.Playing(formatTime(player.currentPosition)))
-        startTimer()
+        musicPlayerControl?.startPlayer()
     }
 
     private fun pausePlayer() {
-        player.pause()
-        stopTimer()
-        playerStateLiveData.postValue(PlayerState.Paused(formatTime(player.currentPosition)))
-    }
-
-    private fun preparePlayer(url: String?) {
-        if (url.isNullOrEmpty()) return
-
-        player.setDataSource(url)
-        player.prepareAsync()
-        player.setOnPreparedListener {
-            playerStateLiveData.postValue(PlayerState.Prepared)
-        }
-        player.setOnCompletionListener {
-            stopTimer()
-            playerStateLiveData.postValue(PlayerState.Prepared)
-        }
-    }
-
-    private fun startTimer() {
-        updateTimer?.cancel()
-        updateTimer = viewModelScope.launch {
-            while (player.isPlaying) {
-                delay(TRACK_TIME_UPDATE_INTERVAL)
-                playerStateLiveData.postValue(PlayerState.Playing(formatTime(player.currentPosition)))
-            }
-        }
-    }
-
-    private fun stopTimer() {
-        updateTimer?.cancel()
-    }
-
-    fun onPaused() {
-        pausePlayer()
+        musicPlayerControl?.pausePlayer()
     }
 
     override fun onCleared() {
         super.onCleared()
-        pausePlayer()
-        player.release()
+
+        musicPlayerControl = null
     }
 
-    private fun formatTime(time: Int): String = Track.trackTimeFormat.format(time)
-
-    companion object {
-        private val TRACK_TIME_UPDATE_INTERVAL = 300.milliseconds
+    fun onFragmentPaused() {
+        musicPlayerControl?.startForeground()
     }
 
+    fun onFragmentResumed() {
+        musicPlayerControl?.stopForeground()
+    }
+
+    private fun mapState(state: MusicPlayerState) = when (state) {
+        is MusicPlayerState.Default -> PlayerState.Default
+        is MusicPlayerState.Prepared -> PlayerState.Prepared
+        is MusicPlayerState.Paused -> PlayerState.Paused(state.progressTime)
+        is MusicPlayerState.Playing -> PlayerState.Playing(state.progressTime)
+    }
 }
 
 sealed class PlayerState(val isPlayButtonEnabled: Boolean, val progressTime: String) {

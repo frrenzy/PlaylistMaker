@@ -57,7 +57,10 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
         if (isGranted) {
             bindMusicService()
         } else {
-            Toast.makeText(requireContext(), "Can't start foreground service!", Toast.LENGTH_LONG)
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.can_not_start_foreground_service), Toast.LENGTH_LONG
+            )
                 .show()
         }
     }

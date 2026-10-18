@@ -22,6 +22,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -57,13 +58,13 @@ class MusicService : Service(), MusicPlayerControl {
 
     override fun startPlayer() {
         player?.start()
-        _state.value = MusicPlayerState.Playing(getCurrentPlayerPosition())
+        _state.update { MusicPlayerState.Playing(getCurrentPlayerPosition()) }
         startTimer()
     }
 
     override fun pausePlayer() {
         player?.pause()
-        _state.value = MusicPlayerState.Paused(getCurrentPlayerPosition())
+        _state.update { MusicPlayerState.Paused(getCurrentPlayerPosition()) }
         stopTimer()
     }
 
@@ -76,11 +77,11 @@ class MusicService : Service(), MusicPlayerControl {
         player?.setDataSource(track?.previewUrl)
         player?.prepareAsync()
         player?.setOnPreparedListener {
-            _state.value = MusicPlayerState.Prepared
+            _state.update { MusicPlayerState.Prepared }
         }
         player?.setOnCompletionListener {
             stopTimer()
-            _state.value = MusicPlayerState.Prepared
+            _state.update { MusicPlayerState.Prepared }
             if (isForegroundRunning) {
                 stopForeground()
             }
@@ -92,7 +93,7 @@ class MusicService : Service(), MusicPlayerControl {
         updateTimerJob = CoroutineScope(Dispatchers.IO).launch {
             while (player?.isPlaying ?: false) {
                 delay(TRACK_TIME_UPDATE_INTERVAL)
-                _state.value = MusicPlayerState.Playing(getCurrentPlayerPosition())
+                _state.update { MusicPlayerState.Playing(getCurrentPlayerPosition()) }
             }
         }
     }

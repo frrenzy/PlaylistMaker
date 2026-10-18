@@ -65,4 +65,5 @@
     <string name="playlist_edit_button">Сохранить</string>
     <string name="playlist_edit_title">Редактировать</string>
     <string name="track_notification">%1$s - %2$s</string>
+    <string name="can_not_start_foreground_service">Can\'t start foreground service!</string>
 </resources>

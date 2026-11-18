@@ -4,40 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.playlistmaker.databinding.FragmentSettingsBinding
-import com.example.playlistmaker.settings.presentation.SettingsViewModel
-import com.example.playlistmaker.utils.ui.BindingFragment
-import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import androidx.compose.ui.platform.ComposeView
+import androidx.fragment.app.Fragment
 
-class SettingsFragment : BindingFragment<FragmentSettingsBinding>() {
-    private val viewModel: SettingsViewModel by activityViewModel()
-
-    override fun createBinding(
+class SettingsFragment : Fragment() {
+    override fun onCreateView(
         inflater: LayoutInflater,
-        container: ViewGroup?
-    ) = FragmentSettingsBinding.inflate(inflater, container, false)
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        binding.apply {
-            viewModel.observeIsDark().observe(viewLifecycleOwner) {
-                themeSwitcher.isChecked = it
-            }
-            themeSwitcher.setOnCheckedChangeListener { _, checked ->
-                viewModel.setTheme(checked)
-            }
-
-            shareButton.setOnClickListener {
-                viewModel.shareApp()
-            }
-
-            supportButton.setOnClickListener {
-                viewModel.sendSupportTicket()
-            }
-
-            agreementButton.setOnClickListener {
-                viewModel.openUserAgreement()
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setContent {
+                Settings()
             }
         }
     }

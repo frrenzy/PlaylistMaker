@@ -26,14 +26,15 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
 import com.example.playlistmaker.R
 import com.example.playlistmaker.common.ui.theme.Theme
 
 @Composable
-fun ScreenLayout(@StringRes title: Int, showBackButton: Boolean, content: @Composable () -> Unit) {
-    val navController = rememberNavController()
-
+fun ScreenLayout(
+    @StringRes title: Int,
+    onBackClick: (() -> Unit)? = null,
+    content: @Composable () -> Unit
+) {
     Theme {
         Column(
             modifier = Modifier
@@ -46,11 +47,11 @@ fun ScreenLayout(@StringRes title: Int, showBackButton: Boolean, content: @Compo
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(height = dimensionResource(R.dimen.title_height))
-                    .clickable(enabled = showBackButton) {
-                        navController.navigateUp()
+                    .clickable(enabled = onBackClick != null) {
+                        onBackClick?.invoke()
                     }) {
 
-                if (showBackButton) {
+                if (onBackClick != null) {
                     Box(
                         modifier = Modifier
                             .padding(top = 4.dp)
@@ -86,7 +87,7 @@ fun ScreenLayout(@StringRes title: Int, showBackButton: Boolean, content: @Compo
 @Preview(showSystemUi = true)
 @Composable
 private fun ScreenLayoutPreview() {
-    ScreenLayout(title = R.string.new_playlist, showBackButton = true) {
+    ScreenLayout(title = R.string.new_playlist) {
         Text("Aboba")
     }
 }

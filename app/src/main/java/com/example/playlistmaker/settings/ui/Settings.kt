@@ -24,7 +24,7 @@ fun Settings() {
 
     val controlModifier = Modifier.height(24.dp)
 
-    ScreenLayout(title = R.string.settings, showBackButton = false) {
+    ScreenLayout(title = R.string.settings) {
         Column {
             SettingsLine(title = R.string.settings_theme) {
                 Switch(

@@ -20,7 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -112,14 +111,10 @@ fun Search(onTrackClick: (track: Track) -> Unit) {
 
     val historyViewModel = koinViewModel<HistoryViewModel>()
 
-    LaunchedEffect(Unit) {
-        historyViewModel.loadSavedTracks()
-    }
-
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 
-    ScreenLayout(R.string.search, showBackButton = false) {
+    ScreenLayout(R.string.search) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Box(
                 modifier = Modifier
@@ -176,6 +171,7 @@ fun Search(onTrackClick: (track: Track) -> Unit) {
                         .clickable(enabled = true) {
                             searchViewModel.onClear()
                             historyViewModel.onClearSearch()
+                            keyboardController?.hide()
                         },
                     contentAlignment = Alignment.Center,
                 ) {

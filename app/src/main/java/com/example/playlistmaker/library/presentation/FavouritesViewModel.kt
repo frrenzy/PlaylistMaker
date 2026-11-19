@@ -1,17 +1,17 @@
 package com.example.playlistmaker.library.presentation
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.common.domain.models.Track
 import com.example.playlistmaker.library.domain.FavouriteTracksInteractor
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class FavouritesViewModel(private val favouritesInteractor: FavouriteTracksInteractor) :
     ViewModel() {
-    private var favouritesLiveData = MutableLiveData<FavouritesState>()
-    fun observeFavouritesState(): LiveData<FavouritesState> = favouritesLiveData
+    private val _favourites = MutableStateFlow<FavouritesState>(FavouritesState.Empty)
+    val favourites = _favourites.asStateFlow()
 
     fun loadTracks() {
         viewModelScope.launch {
@@ -19,7 +19,7 @@ class FavouritesViewModel(private val favouritesInteractor: FavouriteTracksInter
                 val state = if (it.isEmpty()) FavouritesState.Empty
                 else FavouritesState.Tracks(it)
 
-                favouritesLiveData.postValue(state)
+                _favourites.value = state
             }
         }
     }

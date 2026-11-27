@@ -1,7 +1,5 @@
 package com.example.playlistmaker.search.presentation
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.common.domain.models.Track
@@ -9,15 +7,18 @@ import com.example.playlistmaker.search.domain.SearchResult
 import com.example.playlistmaker.search.domain.TracksInteractor
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 class SearchViewModel(private val searchInteractor: TracksInteractor) : ViewModel() {
-    private val searchStateLiveData = MutableLiveData<SearchState>(SearchState.Default)
-    fun observeSearchState(): LiveData<SearchState> = searchStateLiveData
+    private val _searchState = MutableStateFlow<SearchState>(SearchState.Default)
+    val searchState = _searchState.asStateFlow()
 
-    private var searchTerm = ""
+    private val _searchTerm = MutableStateFlow("")
+    val searchTerm = _searchTerm.asStateFlow()
 
     private var searchJob: Job? = null
 
@@ -25,8 +26,8 @@ class SearchViewModel(private val searchInteractor: TracksInteractor) : ViewMode
         loadTracks(0.milliseconds)
     }
 
-    fun onSearchTextChanged(s: CharSequence?) {
-        searchTerm = s?.toString().orEmpty()
+    fun onSearchTextChanged(s: String) {
+        _searchTerm.value = s
         loadTracks()
     }
 
@@ -36,6 +37,7 @@ class SearchViewModel(private val searchInteractor: TracksInteractor) : ViewMode
 
     fun onClear() {
         sendUpdate(SearchState.Default)
+        _searchTerm.value = ""
     }
 
     private fun loadTracks(searchDelay: Duration = SEARCH_DEBOUNCE_DELAY) {
@@ -48,13 +50,13 @@ class SearchViewModel(private val searchInteractor: TracksInteractor) : ViewMode
 
 
     private suspend fun doSearchRequest() {
-        if (searchTerm.isEmpty()) {
+        if (_searchTerm.value.isEmpty()) {
             return
         }
 
         sendUpdate(SearchState.Loading)
 
-        searchInteractor.searchTracks(searchTerm).collect {
+        searchInteractor.searchTracks(_searchTerm.value).collect {
             val state = when (it) {
                 is SearchResult.Success -> SearchState.Content(it.tracks)
                 is SearchResult.Empty -> SearchState.Empty
@@ -66,11 +68,10 @@ class SearchViewModel(private val searchInteractor: TracksInteractor) : ViewMode
     }
 
     fun sendUpdate(state: SearchState) {
-        searchStateLiveData.postValue(state)
+        _searchState.value = state
     }
 
     override fun onCleared() {
-        super.onCleared()
         searchJob?.cancel()
     }
 

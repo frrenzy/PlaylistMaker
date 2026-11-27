@@ -1,33 +1,36 @@
 package com.example.playlistmaker.history.presentation
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.common.domain.models.Track
 import com.example.playlistmaker.history.domain.TracksHistoryInteractor
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class HistoryViewModel(private val historyInteractor: TracksHistoryInteractor) : ViewModel() {
-    private val historyLiveData = MutableLiveData<HistoryState>()
-    fun observeHistory(): LiveData<HistoryState> = historyLiveData
+    private val _history = MutableStateFlow<HistoryState>(HistoryState(emptyList(), false))
+    val history = _history.asStateFlow()
 
     private var isSearchFocused = false
     private var isSearchEmpty = true
 
-    init {
+    fun loadSavedTracks() {
         viewModelScope.launch {
-            historyLiveData.postValue(
-                HistoryState(
-                    historyInteractor.getSavedTracks(),
-                    false,
-                )
+            _history.value = HistoryState(
+                historyInteractor.getSavedTracks(),
+                false,
             )
         }
     }
 
-    fun onClear() {
+    fun onClearHistory() {
         historyInteractor.clearHistory()
+        sendUpdate()
+    }
+
+    fun onClearSearch() {
+        isSearchEmpty = true
         sendUpdate()
     }
 
@@ -41,19 +44,17 @@ class HistoryViewModel(private val historyInteractor: TracksHistoryInteractor) :
         sendUpdate()
     }
 
-    fun onSearchTextChanged(s: CharSequence?) {
-        isSearchEmpty = s.isNullOrEmpty()
+    fun onSearchTextChanged(s: String) {
+        isSearchEmpty = s.isEmpty()
         sendUpdate()
     }
 
     private fun sendUpdate() {
         viewModelScope.launch {
             val tracks = historyInteractor.getSavedTracks()
-            historyLiveData.postValue(
-                HistoryState(
-                    tracks,
-                    !tracks.isEmpty() && isSearchEmpty && isSearchFocused,
-                )
+            _history.value = HistoryState(
+                tracks,
+                !tracks.isEmpty() && isSearchEmpty && isSearchFocused,
             )
         }
     }
